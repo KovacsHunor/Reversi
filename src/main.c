@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
+#include <SDL_ttf.h>
 
 enum
 {
@@ -57,11 +58,39 @@ void drawTable(SDL_Renderer *renderer)
     SDL_RenderPresent(renderer);
 }
 
+void drawFont(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, char* text){
+    SDL_Color feher = {255, 255, 255};
+
+    TTF_Font *font = TTF_OpenFont("../fonts/LiberationSerif-Regular.ttf", pt);
+    if (!font) {
+        SDL_Log("Nem sikerult megnyitni a fontot! %s\n", TTF_GetError());
+        exit(1);
+    }
+
+    SDL_Surface *felirat;
+    SDL_Texture *felirat_t;
+    SDL_Rect hova = { 0, 0, 0, 0 };
+
+    felirat = TTF_RenderUTF8_Solid(font, text, feher);
+    felirat_t = SDL_CreateTextureFromSurface(renderer, felirat);
+    hova.x = x;
+    hova.y = y;
+    hova.w = felirat->w;
+    hova.h = felirat->h;
+    SDL_RenderCopy(renderer, felirat_t, NULL, &hova);
+    SDL_FreeSurface(felirat);
+    SDL_DestroyTexture(felirat_t);
+}
+
 int main()
 {
     SDL_Window *window;
     SDL_Renderer *renderer;
     sdl_init(WIDTH, HEIGHT, &window, &renderer);
+    TTF_Init();
+
+    drawFont(renderer, 100, 100, 100, 100, 64, "MENÜ");
+
 
     enum State
     {

@@ -18,7 +18,7 @@ void sdl_init(int szeles, int magas, SDL_Window **pwindow, SDL_Renderer **prende
         SDL_Log("Nem indithato az SDL: %s", SDL_GetError());
         exit(1);
     }
-    SDL_Window *window = SDL_CreateWindow("SDL peldaprogram", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, szeles, magas, 0);
+    SDL_Window *window = SDL_CreateWindow("SDL peldaprogram", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, szeles, magas, SDL_WINDOW_MAXIMIZED);
     if (window == NULL)
     {
         SDL_Log("Nem hozhato letre az ablak: %s", SDL_GetError());
@@ -36,14 +36,6 @@ void sdl_init(int szeles, int magas, SDL_Window **pwindow, SDL_Renderer **prende
     *prenderer = renderer;
 }
 
-void drawMenu(SDL_Renderer *renderer)
-{
-    SDL_Rect r = {WIDTH / 2 - 100, HEIGHT / 2 - 300, 200, 100};
-    SDL_SetRenderDrawColor(renderer, 100, 100, 100, 255);
-    SDL_RenderFillRect(renderer, &r);
-    SDL_RenderPresent(renderer);
-}
-
 void drawTable(SDL_Renderer *renderer)
 {
     for (int i = 0; i < BOARDSIZE; i++)
@@ -58,9 +50,17 @@ void drawTable(SDL_Renderer *renderer)
     SDL_RenderPresent(renderer);
 }
 
-void drawFont(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, char* text){
-    SDL_Color feher = {255, 255, 255};
+typedef struct Button{
+    int x, y, w, h;
+    char* text;
+    SDL_Color bg_color, text_color;
+}Button;
 
+bool bt_hover(Button bt, int x, int y){
+    return x <= bt.x+bt.w && x >= bt.x && y <= bt.y+bt.h && y >= bt.y;
+}
+
+void renderText(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, SDL_Color c, char* text){
     TTF_Font *font = TTF_OpenFont("../fonts/LiberationSerif-Regular.ttf", pt);
     if (!font) {
         SDL_Log("Nem sikerult megnyitni a fontot! %s\n", TTF_GetError());
@@ -71,7 +71,7 @@ void drawFont(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, char* 
     SDL_Texture *felirat_t;
     SDL_Rect hova = { 0, 0, 0, 0 };
 
-    felirat = TTF_RenderUTF8_Solid(font, text, feher);
+    felirat = TTF_RenderUTF8_Solid(font, text, c);
     felirat_t = SDL_CreateTextureFromSurface(renderer, felirat);
     hova.x = x;
     hova.y = y;
@@ -82,6 +82,24 @@ void drawFont(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, char* 
     SDL_DestroyTexture(felirat_t);
 }
 
+void renderRect(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Color c){
+    SDL_Rect r = {x, y, w, h};
+    SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+    SDL_RenderFillRect(renderer, &r);
+}
+
+void drawButton(SDL_Renderer *renderer, Button bt)
+{
+    int pt = 32;
+    renderRect(renderer, bt.x, bt.y, bt.w, bt.h, bt.bg_color);
+    renderText(renderer, bt.x, bt.y, bt.w, bt.h, pt, bt.text_color, bt.text);
+    SDL_RenderPresent(renderer);
+}
+
+
+
+
+
 int main()
 {
     SDL_Window *window;
@@ -89,8 +107,8 @@ int main()
     sdl_init(WIDTH, HEIGHT, &window, &renderer);
     TTF_Init();
 
-    drawFont(renderer, 100, 100, 100, 100, 64, "MENÜ");
-
+    Button menu = {100, 100, 200, 50, "Menu", (SDL_Color){100, 100, 100}, (SDL_Color){255, 255, 255}};
+    drawButton(renderer, menu);
 
     enum State
     {
@@ -100,9 +118,8 @@ int main()
     };
 
     enum State state = MENU;
-    drawMenu(renderer);
     while (state != QUIT)
-    {
+    {   
         SDL_Event event;
         SDL_WaitEvent(&event);
 
@@ -115,7 +132,10 @@ int main()
             switch (state)
             {
             case MENU:
-                if (event.button.x)
+                if (bt_hover(menu, event.button.x, event.button.y)){
+                    state = GAME;
+                    drawTable(renderer);
+                }
                 break;
             }
             }

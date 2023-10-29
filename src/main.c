@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL_ttf.h>
+#include <SDL_image.h>
 
 enum
 {
@@ -11,14 +12,18 @@ enum
     WIDTH = 1000
 };
 
-void sdl_init(int szeles, int magas, SDL_Window **pwindow, SDL_Renderer **prenderer)
+/*
+initialize sdl
+puts the size of the window in width and height parameters*/
+void sdl_init(int* width, int* height, SDL_Window **pwindow, SDL_Renderer **prenderer, Uint32 mode)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
         SDL_Log("Nem indithato az SDL: %s", SDL_GetError());
         exit(1);
     }
-    SDL_Window *window = SDL_CreateWindow("SDL peldaprogram", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, szeles, magas, SDL_WINDOW_MAXIMIZED);
+    SDL_Window *window = SDL_CreateWindow("SDL peldaprogram", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, *width, *height, mode);
+    SDL_GetWindowSize(window, width, height);
     if (window == NULL)
     {
         SDL_Log("Nem hozhato letre az ablak: %s", SDL_GetError());
@@ -50,14 +55,14 @@ void drawTable(SDL_Renderer *renderer)
     SDL_RenderPresent(renderer);
 }
 
-typedef struct Button{
+typedef struct Image{
     int x, y, w, h;
-    char* text;
-    SDL_Color bg_color, text_color;
-}Button;
+    SDL_Texture *sprite;
+    bool pressed;
+}Image;
 
-bool bt_hover(Button bt, int x, int y){
-    return x <= bt.x+bt.w && x >= bt.x && y <= bt.y+bt.h && y >= bt.y;
+bool img_hover(Image img, int x, int y){
+    return x <= img.x+img.w && x >= img.x && y <= img.y+img.h && y >= img.y;
 }
 
 void renderText(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, SDL_Color c, char* text){
@@ -82,42 +87,45 @@ void renderText(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, SDL_
     SDL_DestroyTexture(felirat_t);
 }
 
-void renderRect(SDL_Renderer *renderer, int x, int y, int w, int h, SDL_Color c){
-    SDL_Rect r = {x, y, w, h};
-    SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
-    SDL_RenderFillRect(renderer, &r);
+void setupImage(Image* img, int x, int y, char* path, SDL_Renderer *renderer){
+    *img = (Image){x, y, 0, 0, IMG_LoadTexture(renderer, path), false};
+    SDL_QueryTexture(img->sprite, NULL, NULL, &(img->w), &(img->h));
 }
 
-void drawButton(SDL_Renderer *renderer, Button bt)
+void drawImage(SDL_Renderer *renderer, Image img)
 {
-    int pt = 32;
-    renderRect(renderer, bt.x, bt.y, bt.w, bt.h, bt.bg_color);
-    renderText(renderer, bt.x, bt.y, bt.w, bt.h, pt, bt.text_color, bt.text);
+    SDL_Rect rect;
+    rect.x = img.x; rect.y = img.y; rect.w = img.w*0.5; rect.h = img.h*0.5; 
+    SDL_RenderCopy(renderer, img.sprite, NULL, &rect);
     SDL_RenderPresent(renderer);
 }
-
-
-
 
 
 int main()
 {
     SDL_Window *window;
     SDL_Renderer *renderer;
-    sdl_init(WIDTH, HEIGHT, &window, &renderer);
+    int width = 1000, height = 1000;
+    sdl_init(&width, &height, &window, &renderer, 0);
     TTF_Init();
 
-    Button menu = {100, 100, 200, 50, "Menu", (SDL_Color){100, 100, 100}, (SDL_Color){255, 255, 255}};
-    drawButton(renderer, menu);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+
+    Image menu;
+    setupImage(&menu, width-150, 50, "../sprites/menu_B.png", renderer);
+
+    drawImage(renderer, menu);
 
     enum State
     {
-        QUIT,
+        NEW,
         GAME,
-        MENU
+        SAVED,
+        QUIT
     };
 
-    enum State state = MENU;
+    enum State state = NEW;
     while (state != QUIT)
     {   
         SDL_Event event;
@@ -131,9 +139,10 @@ int main()
             if(event.button.button == SDL_BUTTON_LEFT){
             switch (state)
             {
-            case MENU:
-                if (bt_hover(menu, event.button.x, event.button.y)){
+            case NEW:
+                if (img_hover(menu, event.button.x, event.button.y)){
                     state = GAME;
+                    SDL_RenderClear(renderer);
                     drawTable(renderer);
                 }
                 break;

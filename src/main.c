@@ -4,6 +4,8 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
+#include "../headers/image.h"
+
 enum
 {
     BOARDSIZE = 8,
@@ -55,16 +57,6 @@ void drawTable(SDL_Renderer *renderer)
     SDL_RenderPresent(renderer);
 }
 
-typedef struct Image{
-    int x, y, w, h;
-    SDL_Texture *sprite;
-    bool pressed;
-}Image;
-
-bool img_hover(Image img, int x, int y){
-    return x <= img.x+img.w && x >= img.x && y <= img.y+img.h && y >= img.y;
-}
-
 void renderText(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, SDL_Color c, char* text){
     TTF_Font *font = TTF_OpenFont("../fonts/LiberationSerif-Regular.ttf", pt);
     if (!font) {
@@ -87,20 +79,6 @@ void renderText(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, SDL_
     SDL_DestroyTexture(felirat_t);
 }
 
-void setupImage(Image* img, int x, int y, char* path, SDL_Renderer *renderer){
-    *img = (Image){x, y, 0, 0, IMG_LoadTexture(renderer, path), false};
-    SDL_QueryTexture(img->sprite, NULL, NULL, &(img->w), &(img->h));
-}
-
-void drawImage(SDL_Renderer *renderer, Image img)
-{
-    SDL_Rect rect;
-    rect.x = img.x; rect.y = img.y; rect.w = img.w*0.5; rect.h = img.h*0.5; 
-    SDL_RenderCopy(renderer, img.sprite, NULL, &rect);
-    SDL_RenderPresent(renderer);
-}
-
-
 int main()
 {
     SDL_Window *window;
@@ -113,9 +91,9 @@ int main()
     SDL_RenderClear(renderer);
 
     Image menu;
-    setupImage(&menu, width-150, 50, "../sprites/menu_B.png", renderer);
+    img_init(&menu, width-150, 50, "../sprites/menu_B.png", renderer);
 
-    drawImage(renderer, menu);
+    img_draw(renderer, menu);
 
     enum State
     {

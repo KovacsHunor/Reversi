@@ -4,96 +4,26 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
-#include "../headers/image.h"
+#include "debugmalloc.h"
+#include "image.h"
+#include "master.h"
+#include "board.h"
+#include "quality_of_life.h"
 
-enum
-{
-    BOARDSIZE = 8,
-    TILESIZE = 100,
-    HEIGHT = 1000,
-    WIDTH = 1000
-};
-
-/*
-initialize sdl
-puts the size of the window in width and height parameters*/
-void sdl_init(int* width, int* height, SDL_Window **pwindow, SDL_Renderer **prenderer, Uint32 mode)
-{
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-    {
-        SDL_Log("Nem indithato az SDL: %s", SDL_GetError());
-        exit(1);
-    }
-    SDL_Window *window = SDL_CreateWindow("SDL peldaprogram", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, *width, *height, mode);
-    SDL_GetWindowSize(window, width, height);
-    if (window == NULL)
-    {
-        SDL_Log("Nem hozhato letre az ablak: %s", SDL_GetError());
-        exit(1);
-    }
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
-    if (renderer == NULL)
-    {
-        SDL_Log("Nem hozhato letre a megjelenito: %s", SDL_GetError());
-        exit(1);
-    }
-    SDL_RenderClear(renderer);
-
-    *pwindow = window;
-    *prenderer = renderer;
-}
-
-void drawTable(SDL_Renderer *renderer)
-{
-    for (int i = 0; i < BOARDSIZE; i++)
-    {
-        for (int j = 0; j < BOARDSIZE; j++)
-        {
-            SDL_Rect r = {i * (TILESIZE + 1) + 100, j * (TILESIZE + 1) + 100, TILESIZE, TILESIZE};
-            SDL_SetRenderDrawColor(renderer, 0, (i + j) % 2 ? 120 : 130, 0, 255);
-            SDL_RenderFillRect(renderer, &r);
-        }
-    }
-    SDL_RenderPresent(renderer);
-}
-
-void renderText(SDL_Renderer *renderer, int x, int y, int w, int h, int pt, SDL_Color c, char* text){
-    TTF_Font *font = TTF_OpenFont("../fonts/LiberationSerif-Regular.ttf", pt);
-    if (!font) {
-        SDL_Log("Nem sikerult megnyitni a fontot! %s\n", TTF_GetError());
-        exit(1);
-    }
-
-    SDL_Surface *felirat;
-    SDL_Texture *felirat_t;
-    SDL_Rect hova = { 0, 0, 0, 0 };
-
-    felirat = TTF_RenderUTF8_Solid(font, text, c);
-    felirat_t = SDL_CreateTextureFromSurface(renderer, felirat);
-    hova.x = x;
-    hova.y = y;
-    hova.w = felirat->w;
-    hova.h = felirat->h;
-    SDL_RenderCopy(renderer, felirat_t, NULL, &hova);
-    SDL_FreeSurface(felirat);
-    SDL_DestroyTexture(felirat_t);
-}
+#define BOARDSIZE 8
 
 int main()
 {
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    int width = 1000, height = 1000;
-    sdl_init(&width, &height, &window, &renderer, 0);
+    Master master = master_init(1920, 1080, SDL_WINDOW_RESIZABLE); //option: SDL_WINDOW_MAXIMIZED
     TTF_Init();
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    SDL_SetRenderDrawColor(master.renderer, 0, 0, 0, 255);
+    SDL_RenderClear(master.renderer);
 
-    Image menu;
-    img_init(&menu, width-150, 50, "../sprites/menu_B.png", renderer);
+    Image menu = img_init(master.width-200, 100, "../sprites/menu_B.png", &master);
+    img_draw(&master, &menu);
 
-    img_draw(renderer, menu);
+    Board board = board_init(800, &master);
 
     enum State
     {
@@ -118,10 +48,10 @@ int main()
             switch (state)
             {
             case NEW:
-                if (img_hover(menu, event.button.x, event.button.y)){
+                if (img_hover(&menu, event.button.x, event.button.y)){
                     state = GAME;
-                    SDL_RenderClear(renderer);
-                    drawTable(renderer);
+                    SDL_RenderClear(master.renderer);
+                    board_draw(&master, &board);
                 }
                 break;
             }

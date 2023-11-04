@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
+#include "master.h"
 
 
 typedef struct Image{
@@ -12,11 +13,11 @@ typedef struct Image{
     bool pressed;
 }Image;
 
-bool img_hover(Image img, int x, int y);
+bool img_hover(Image* img, int x, int y);
 
-void img_init(Image* img, int x, int y, char* path, SDL_Renderer *renderer);
+Image img_init(int x, int y, char* path, Master* m);
 
-void img_draw(SDL_Renderer *renderer, Image img);
+void img_draw(Master* m, Image* img);
 
 
 #endif

@@ -10,14 +10,14 @@
 typedef struct Image{
     int x, y, w, h;
     SDL_Texture *sprite;
-    bool pressed;
+    bool visible;
 }Image;
 
 bool img_hover(Image* img, int x, int y);
 
-Image img_init(int x, int y, char* path, Master* m);
+Image img_init(int x, int y, char* path, Master* m, bool visible);
 
-void img_draw(Master* m, Image* img);
+void img_draw(Image* img, Master* m);
 
 
 #endif

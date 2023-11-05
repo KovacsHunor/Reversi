@@ -1,9 +1,8 @@
 #include "board.h"
-#include "master.h"
 #define TILECOUNT 8
 
 Board board_init(int board_length, Master* m){
-    return (Board){.tile_count = TILECOUNT, .tile_size = board_length/TILECOUNT, .posititon = (Point){m->width/2 - board_length/2, m->height/2 - board_length/2}};
+    return (Board){.tile_count = TILECOUNT, .tile_size = board_length/TILECOUNT, .x = m->width/2 - board_length/2, .y = m->height/2 - board_length/2};
 }
 
 void board_disks_init(Board* b){
@@ -34,8 +33,8 @@ void board_clear_board(Board* b,  Master* m){
 
 Disk board_create_disk(disk_color color, Master* m)
 {
-    if(color == WHITE) return (Disk){color, img_init(0, 0, "../sprites/disk_W.png", m)};
-    if(color == BLACK) return (Disk){color, img_init(0, 0, "../sprites/disk_B.png", m)};
+    if(color == WHITE) return (Disk){color, img_init(0, 0, "../sprites/disk_W.png", m, true)};
+    if(color == BLACK) return (Disk){color, img_init(0, 0, "../sprites/disk_B.png", m, true)};
     return (Disk){color};
 };
 
@@ -45,10 +44,11 @@ void board_draw(Master* m, Board* b)
     {
         for (int j = 0; j < b->tile_count; j++)
         {
-            SDL_Rect r = {i * (b->tile_size + 1) + b->posititon.x, j * (b->tile_size + 1) + b->posititon.y, b->tile_size, b->tile_size};
+            SDL_Rect r = {i * (b->tile_size + 1) + b->x, j * (b->tile_size + 1) + b->y, b->tile_size, b->tile_size};
             SDL_SetRenderDrawColor(m->renderer, 0, (i + j) % 2 ? 120 : 130, 0, 255);
             SDL_RenderFillRect(m->renderer, &r);
         }
     }
+    SDL_SetRenderDrawColor(m->renderer, 0, 0, 0, 255);
     SDL_RenderPresent(m->renderer);
 }

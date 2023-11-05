@@ -4,7 +4,6 @@
 #include <stdlib.h>
 
 #include "image.h"
-#include "quality_of_life.h"
 
 typedef enum disk_color{
     WHITE, BLACK, NONE
@@ -18,7 +17,7 @@ typedef struct Disk{
 typedef struct Board{
     int tile_size;
     int tile_count;
-    Point posititon;
+    int x, y;
     Disk** disks;
 }Board;
 

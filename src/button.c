@@ -53,18 +53,20 @@ void button_event(int x, int y, Button* b, Master* m, Board* board){
     }
 
     SDL_RenderClear(m->renderer);
-    button_draw_all(b, m);
+    button_render_all(b, m);
 
     if(b[PLAY].pressed){
-        board_draw(m, board);
+        board_render(m, board);
     }
+
+    SDL_RenderPresent(m->renderer);
 }
 
-void button_draw_all(Button* b, Master* m){
+void button_render_all(Button* b, Master* m){
     for (int i = 0; i < SIZE; i++)
     {
         if(b[i].img.visible){
-            img_draw(&b[i].img, m);
+            img_render(&b[i].img, m);
         }
         else{
             //conceal the remaining pixels

@@ -24,7 +24,7 @@ int main()
 
     Button ctrl_buttons[SIZE];
     button_ctrl_init(ctrl_buttons, &master);
-    button_draw_all(ctrl_buttons, &master);
+    button_render_all(ctrl_buttons, &master);
 
 
     bool quit = false;

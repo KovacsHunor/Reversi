@@ -38,7 +38,7 @@ Disk board_create_disk(disk_color color, Master* m)
     return (Disk){color};
 };
 
-void board_draw(Master* m, Board* b)
+void board_render(Master* m, Board* b)
 {
     for (int i = 0; i < b->tile_count; i++)
     {

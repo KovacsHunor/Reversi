@@ -17,7 +17,7 @@ bool img_hover(Image* img, int x, int y);
 
 Image img_init(int x, int y, char* path, Master* m, bool visible);
 
-void img_draw(Image* img, Master* m);
+void img_render(Image* img, Master* m);
 
 
 #endif

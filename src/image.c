@@ -10,10 +10,9 @@ Image img_init(int x, int y, char* path, Master* m, bool visible){
     return img;
 }
 
-void img_draw(Image* img, Master* m)
+void img_render(Image* img, Master* m)
 {
     SDL_Rect rect;
     rect.x = img->x; rect.y = img->y; rect.w = img->w; rect.h = img->h; 
     SDL_RenderCopy(m->renderer, img->sprite, NULL, &rect);
-    SDL_RenderPresent(m->renderer);
 }

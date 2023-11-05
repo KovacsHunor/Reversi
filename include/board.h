@@ -32,6 +32,6 @@ void board_destruct(Board* b);
 
 void board_disks_default(Board* b);
 
-void board_draw(Master* m, Board* b);
+void board_render(Master* m, Board* b);
 
 #endif

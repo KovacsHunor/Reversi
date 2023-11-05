@@ -6,14 +6,8 @@ void button_ctrl_init(Button* b, Master* m){
     b[HISTORY] = (Button){img_init(m->width-200, 500, "../sprites/history_B.png", m, true), IMG_LoadTexture(m->renderer, "../sprites/history_A.png"), false};
 }
 
-void button_img_switch(Button* b, button_id id){
-    SDL_Texture* temp = b[id].sw_sprite;
-    b[id].sw_sprite = b[id].img.sprite;
-    b[id].img.sprite = temp;
-}
-
 void button_press(Button* b, button_id id){
-    button_img_switch(b, id);
+    img_texture_swap(&b[id].sw_sprite, &b[id].img.sprite);
     b[id].pressed = true;
 }
 
@@ -21,7 +15,7 @@ void button_ctrl_default(Button* b){
     for (int i = 1; i < SIZE; i++)
     {
         if(b[i].pressed){
-            button_img_switch(b, i);
+            img_texture_swap(&b[i].sw_sprite, &b[i].img.sprite);
             b[i].pressed = false;
         }
     }
@@ -38,7 +32,7 @@ void button_event(int x, int y, Button* b, Master* m, Board* board){
         {
             b[i].img.visible = !b[i].img.visible;
         }
-        button_img_switch(b, MENU);
+        img_texture_swap(&b[MENU].sw_sprite, &b[MENU].img.sprite);
         b[MENU].pressed = !b[MENU].pressed;
     }
     if (button_pressable(b, PLAY, x, y)){
@@ -67,9 +61,6 @@ void button_render_all(Button* b, Master* m){
     {
         if(b[i].img.visible){
             img_render(&b[i].img, m);
-        }
-        else{
-            //conceal the remaining pixels
         }
     }
 }

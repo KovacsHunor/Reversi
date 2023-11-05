@@ -5,6 +5,9 @@
         "sdl_image.h": "c",
         "sdl_ttf.h": "c",
         "quality_of_life.h": "c",
-        "master.h": "c"
+        "master.h": "c",
+        "string.h": "c",
+        "sdl.h": "c",
+        "stdlib.h": "c"
     }
 }

@@ -20,8 +20,6 @@ typedef struct Button{
     bool pressed;
 }Button;
 
-void button_img_switch(Button* b, button_id id);
-
 bool button_pressable(Button* b, button_id id, int x, int y);
 
 void button_ctrl_default(Button* b);

@@ -16,3 +16,9 @@ void img_render(Image* img, Master* m)
     rect.x = img->x; rect.y = img->y; rect.w = img->w; rect.h = img->h; 
     SDL_RenderCopy(m->renderer, img->sprite, NULL, &rect);
 }
+
+void img_texture_swap(SDL_Texture** a, SDL_Texture** b){
+    SDL_Texture* temp = *a;
+    *a = *b;
+    *b = temp;
+}

@@ -19,5 +19,6 @@ Image img_init(int x, int y, char* path, Master* m, bool visible);
 
 void img_render(Image* img, Master* m);
 
+void img_texture_swap(SDL_Texture** a, SDL_Texture** b);
 
 #endif

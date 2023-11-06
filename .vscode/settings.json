@@ -8,6 +8,7 @@
         "master.h": "c",
         "string.h": "c",
         "sdl.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "board.h": "c"
     }
 }

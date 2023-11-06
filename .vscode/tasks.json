@@ -12,6 +12,7 @@
                 "master.c",
                 "board.c",
                 "button.c",
+                "extra.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-I${workspaceFolder}/include",

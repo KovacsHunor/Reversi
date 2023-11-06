@@ -23,11 +23,15 @@ int main()
     Board board = board_init(800, &master);
     board_disks_init(&board);
     board_default(&board, &master);
+    board_set_valid(&board, BLACK, &master);
 
     Button ctrl_buttons[SIZE];
     button_ctrl_init(ctrl_buttons, &master);
     button_render_all(ctrl_buttons, &master);
+    
     SDL_RenderPresent(master.renderer);
+
+
 
     bool quit = false;
     while (!quit)

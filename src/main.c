@@ -32,7 +32,7 @@ int main()
     SDL_RenderPresent(master.renderer);
 
 
-
+    disk_color side = BLACK;
     bool quit = false;
     while (!quit)
     {   
@@ -42,7 +42,10 @@ int main()
         switch (event.type)
         {
         case SDL_MOUSEBUTTONUP:
-            if(event.button.button == SDL_BUTTON_LEFT) button_event(event.button.x, event.button.y, ctrl_buttons, &master, &board);
+            if(event.button.button == SDL_BUTTON_LEFT){
+                button_event(event.button.x, event.button.y, ctrl_buttons, &master, &board);
+                board_event(&board, event.button.x, event.button.y, &side, &master);
+            }
             break;
         case SDL_QUIT:
             quit = true;

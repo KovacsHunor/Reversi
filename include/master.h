@@ -16,6 +16,4 @@ Master master_init(int width, int height, Uint32 mode);
 
 void master_set_SDL(Master* m);
 
-void master_destruct(Master* m);
-
 #endif

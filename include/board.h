@@ -8,7 +8,7 @@
 #include "extra.h"
 
 typedef enum disk_color{
-    WHITE, BLACK, VALID
+    WHITE, BLACK, VALID, NONE
 }disk_color;
 
 typedef struct Disk{
@@ -27,10 +27,13 @@ typedef struct Board{
 Board board_init(int board_length, Master* m);
 
 //-
-bool board_validate(Board* b, pos p, disk_color c);
+void board_event(Board* b, int x, int y, disk_color* side, Master* m);
 
 //-
-bool board_rec_valid(Board* b, pos p, pos v, disk_color c, bool first);
+bool board_raycast(Board* b, pos p, disk_color c, bool flip, Master* m);
+
+//-
+bool board_rec_valid(Board* b, pos p, pos v, disk_color c, bool first, bool flip, Master* m);
 
 //-
 disk_color board_flip_color(disk_color c);
@@ -48,10 +51,10 @@ void board_default(Board* b, Master* m);
 void board_set_color(Disk* d, disk_color c, Master* m);
 
 //-
-void board_clear_board(Board* b);
+void board_clear(Board* b, Master* m, bool only_valid);
 
 //-
-Disk board_create_disk(int x, int y, bool visible, disk_color color, Master* m);
+Disk board_create_disk(int x, int y, disk_color color, Master* m);
 
 //-
 void board_destruct(Board* b);

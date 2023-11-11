@@ -45,15 +45,7 @@ void button_event(int x, int y, Button* b, Master* m, Board* board){
         button_ctrl_default(b);
         button_press(b, HISTORY);
     }
-
-    SDL_RenderClear(m->renderer);
     button_render_all(b, m);
-
-    if(b[PLAY].pressed){
-        board_render(m, board);
-    }
-
-    SDL_RenderPresent(m->renderer);
 }
 
 void button_render_all(Button* b, Master* m){

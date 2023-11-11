@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "image.h"
 #include "utility.h"
+#include "font.h"
 
 typedef enum disk_color{
     WHITE, BLACK, VALID, NONE
@@ -17,11 +18,13 @@ typedef struct Disk{
 }Disk;
 
 typedef struct Board{
+    int side[2];
     int tile_size;
     int tile_count;
     int length;
     int x, y;
     int valid_count;
+    pos msg;
     Disk** disks;
 }Board;
 

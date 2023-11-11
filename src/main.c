@@ -43,8 +43,12 @@ int main()
         {
         case SDL_MOUSEBUTTONUP:
             if(event.button.button == SDL_BUTTON_LEFT){
+                SDL_RenderClear(master.renderer);
+
                 button_event(event.button.x, event.button.y, ctrl_buttons, &master, &board);
-                board_event(&board, event.button.x, event.button.y, &side, &master);
+                if(ctrl_buttons[PLAY].pressed) board_event(&board, event.button.x, event.button.y, &side, &master);
+
+                SDL_RenderPresent(master.renderer);
             }
             break;
         case SDL_QUIT:

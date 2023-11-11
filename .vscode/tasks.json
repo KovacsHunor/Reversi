@@ -13,6 +13,7 @@
                 "board.c",
                 "button.c",
                 "utility.c",
+                "font.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-I${workspaceFolder}/include",

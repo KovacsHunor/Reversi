@@ -3,7 +3,7 @@
 
 Board board_init(int board_length, Master *m)
 {
-    return (Board){.valid_count = 0, .length = board_length, .tile_count = TILECOUNT, .tile_size = board_length / TILECOUNT, .x = m->width / 2 - board_length / 2, .y = m->height / 2 - board_length / 2};
+    return (Board){.msg = (pos){200, 500}, .side = {2, 2}, .valid_count = 0, .length = board_length, .tile_count = TILECOUNT, .tile_size = board_length / TILECOUNT, .x = m->width / 2 - board_length / 2, .y = m->height / 2 - board_length / 2};
 }
 
 void board_disks_init(Board *b)
@@ -48,11 +48,17 @@ disk_color board_more(Board* b){
 
 void board_event(Board *b, int x, int y, disk_color *side, Master *m)
 {   
-    if(!pos_hover((pos){b->x, b->y}, (pos){b->length, b->length}, (pos){x, y})) return;
+    if(!pos_hover((pos){b->x, b->y}, (pos){b->length, b->length}, (pos){x, y})){
+        board_render(m, b); 
+        return;
+    }
+
     int i = (x-b->x)/(b->tile_size+1);
     int j = (y-b->y)/(b->tile_size+1);
+
     if (b->disks[i][j].color == VALID && img_hover(&b->disks[i][j].img, x, y))
     {
+        b->side[*side]++;
         board_clear(b, m, true);
         board_set_color(&b->disks[i][j], *side, m);
         board_raycast(b, (pos){j, i}, *side, true, m);
@@ -65,29 +71,26 @@ void board_event(Board *b, int x, int y, disk_color *side, Master *m)
             if(b->valid_count == 0){
                 disk_color winner = board_more(b);
                 if(winner == BLACK){
-                    printf("BLACK win\n");
+                    font_render(m, b->msg, "BLACK win");
                 }
                 else if(winner == WHITE){
-                    printf("WHITE win\n");
+                    font_render(m, b->msg, "WHITE win");
                 }
-                else printf("DRAW\n");
+                else font_render(m, b->msg, "DRAW");
             }
             else{
                 if(*side == BLACK){
-                    printf("WHITE: PASS\n");
+                    font_render(m, b->msg, "WHITE: PASS");
                 }
                 else{
-                    printf("BLACK: PASS\n");
+                    font_render(m, b->msg, "BLACK: PASS");
                 }
             }
         }
-        board_render(m, b);
-        SDL_RenderPresent(m->renderer);
-        return;
     }
+
+    board_render(m, b);
 }
-
-
 
 void board_destruct(Board *b)
 {
@@ -117,8 +120,11 @@ bool board_rec_valid(Board *b, pos p, pos v, disk_color c, bool first, bool flip
         if (current == board_flip_color(c))
         {
             bool found = board_rec_valid(b, pos_add(p, v), v, c, false, flip, m);
-            if (found && flip)
+            if (found && flip){
                 board_set_color(&b->disks[p.y][p.x], c, m);
+                b->side[c]++;
+                b->side[current]--;
+            }
             return found;
         }
     }
@@ -215,6 +221,12 @@ void board_render(Master *m, Board *b)
             }
         }
     }
+    char temp[50];
+    sprintf(temp, "WHITE: %d", b->side[WHITE]);
+    font_render(m, (pos){b->x + b->length/2, b->y-100}, temp);
+
+    sprintf(temp, "BLACK: %d", b->side[BLACK]);
+    font_render(m, (pos){b->x + b->length/2, b->y + b->length + 100}, temp);
+
     SDL_SetRenderDrawColor(m->renderer, 0, 0, 0, 255);
-    SDL_RenderPresent(m->renderer);
 }

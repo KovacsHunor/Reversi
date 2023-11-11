@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 #include "image.h"
-#include "extra.h"
+#include "utility.h"
 
 typedef enum disk_color{
     WHITE, BLACK, VALID, NONE
@@ -19,9 +19,14 @@ typedef struct Disk{
 typedef struct Board{
     int tile_size;
     int tile_count;
+    int length;
     int x, y;
+    int valid_count;
     Disk** disks;
 }Board;
+
+//-
+disk_color board_more(Board* b);
 
 //-
 Board board_init(int board_length, Master* m);

@@ -21,6 +21,7 @@ void button_ctrl_default(Button* b){
     }
 }
 
+
 bool button_pressable(Button* b, button_id id, int x, int y){
     return b[id].img.visible && !b[id].pressed && img_hover(&b[id].img, x, y);
 }

@@ -7,3 +7,11 @@ pos pos_add(pos p1, pos p2){
 bool pos_hover(pos frame, pos size, pos point){
     return point.x>=frame.x && point.y>=frame.y && point.x<=frame.x+size.x && point.y<=frame.y+size.y;
 }
+
+int max(int a, int b){
+    return a>b?a:b;
+}
+
+int min(int a, int b){
+    return a<b?a:b;
+}

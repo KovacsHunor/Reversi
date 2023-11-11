@@ -7,6 +7,7 @@
 #include "image.h"
 #include "utility.h"
 #include "font.h"
+#define TILECOUNT 8
 
 typedef enum disk_color{
     WHITE, BLACK, VALID, NONE
@@ -24,8 +25,9 @@ typedef struct Board{
     int length;
     int x, y;
     int valid_count;
+    disk_color turn;
     pos msg;
-    Disk** disks;
+    Disk disks[8][8];
 }Board;
 
 //-
@@ -49,9 +51,6 @@ disk_color board_flip_color(disk_color c);
 //-
 void board_set_valid(Board* b, disk_color c, Master* m);
 
-//allocates memory for the board, has to be freed after the game finished
-void board_disks_init(Board* b);
-
 //-
 void board_default(Board* b, Master* m);
 
@@ -60,6 +59,9 @@ void board_set_color(Disk* d, disk_color c, Master* m);
 
 //-
 void board_clear(Board* b, Master* m, bool only_valid);
+
+//-
+int minimax(Board* b, int depth, int alpha, int beta, bool maximizing, Master* m);
 
 //-
 Disk board_create_disk(int x, int y, disk_color color, Master* m);

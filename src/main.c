@@ -21,7 +21,6 @@ int main()
     SDL_RenderClear(master.renderer);
 
     Board board = board_init(800, &master);
-    board_disks_init(&board);
     board_default(&board, &master);
     board_set_valid(&board, BLACK, &master);
 

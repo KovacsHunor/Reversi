@@ -52,6 +52,9 @@ disk_color board_flip_color(disk_color c);
 void board_set_valid(Board* b, disk_color c, Master* m);
 
 //-
+void board_print_event(Board *b, Master *m, disk_color *side);
+
+//-
 void board_default(Board* b, Master* m);
 
 //-

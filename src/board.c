@@ -43,7 +43,7 @@ disk_color board_more(Board *b)
 
 int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m)
 {
-    if (depth >= 3)
+    if (depth >= 3 || b->valid_count == 0)
     {
         return b->side[BLACK] - b->side[WHITE];
     }
@@ -71,9 +71,9 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
                         best = value;
                         bestpos = (pos){j, i};
                     }
-                    alpha = max(alpha, value);
+                    alpha = max(alpha, best);
                     if (beta <= alpha)
-                        return alpha;
+                        return best;
                 }
                 else
                 {
@@ -82,9 +82,9 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
                         best = value;
                         bestpos = (pos){j, i};
                     }
-                    beta = min(beta, value);
+                    beta = min(beta, best);
                     if (beta <= alpha)
-                        return beta;
+                        return best;
                 }
             }
         }
@@ -99,33 +99,14 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
     return best;
 }
 
-void board_event(Board *b, int x, int y, disk_color *side, Master *m)
-{
-    if (!pos_hover((pos){b->x, b->y}, (pos){b->length, b->length}, (pos){x, y}))
-    {
-        board_render(m, b);
-        return;
-    }
-
-    int i = (x - b->x) / (b->tile_size + 1);
-    int j = (y - b->y) / (b->tile_size + 1);
-
-    if (b->disks[i][j].color == VALID && img_hover(&b->disks[i][j].img, x, y))
-    {
-        b->side[*side]++;
-        board_clear(b, m, true);
-        board_set_color(&b->disks[i][j], *side, m);
-        board_raycast(b, (pos){j, i}, *side, true, m);
-        *side = board_flip_color(*side);
-        board_set_valid(b, *side, m);
-    }
-
+void board_print_event(Board *b, Master *m, disk_color *side){
     if (b->valid_count == 0)
     {
         *side = board_flip_color(*side);
         board_set_valid(b, *side, m);
         if (b->valid_count == 0)
         {
+            *side = board_flip_color(*side);
             disk_color winner = board_more(b);
             if (winner == BLACK)
             {
@@ -137,6 +118,7 @@ void board_event(Board *b, int x, int y, disk_color *side, Master *m)
             }
             else
                 font_render(m, b->msg, "DRAW");
+            
         }
         else
         {
@@ -150,11 +132,45 @@ void board_event(Board *b, int x, int y, disk_color *side, Master *m)
             }
         }
     }
+}
 
-    minimax(b, 0, INT32_MIN, INT32_MAX, false, m);
-    *side = board_flip_color(*side);
-    board_set_valid(b, *side, m);
+void board_event(Board *b, int x, int y, disk_color *side, Master *m)
+{
+    if (*side == BLACK)
+    {
+        if (!pos_hover((pos){b->x, b->y}, (pos){b->length, b->length}, (pos){x, y}))
+        {
+            board_render(m, b);
+            return;
+        }
 
+        int i = (x - b->x) / (b->tile_size + 1);
+        int j = (y - b->y) / (b->tile_size + 1);
+
+        if (b->disks[i][j].color == VALID && img_hover(&b->disks[i][j].img, x, y))
+        {
+            b->side[*side]++;
+            board_clear(b, m, true);
+            board_set_color(&b->disks[i][j], *side, m);
+            board_raycast(b, (pos){j, i}, *side, true, m);
+            *side = board_flip_color(*side);
+            board_set_valid(b, *side, m);
+        }
+    }
+    else
+    {
+        board_render(m, b);
+        SDL_RenderPresent(m->renderer);
+
+        minimax(b, 0, INT32_MIN, INT32_MAX, false, m);
+        *side = board_flip_color(*side);
+        board_set_valid(b, *side, m);
+    }
+
+    board_print_event(b, m, side);
+
+    if (*side == WHITE)
+        board_event(b, x, y, side, m);
     board_render(m, b);
 }
 

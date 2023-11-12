@@ -99,79 +99,82 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
     return best;
 }
 
-void board_print_event(Board *b, Master *m, disk_color *side){
+void board_print_event(Board *b, Master *m, disk_color side, b_event e)
+{
+    if (e == END)
+    {
+        disk_color winner = board_more(b);
+        if (winner == BLACK)
+        {
+            font_render(m, b->msg, "BLACK win");
+        }
+        else if (winner == WHITE)
+        {
+            font_render(m, b->msg, "WHITE win");
+        }
+        else
+            font_render(m, b->msg, "DRAW");
+    }
+    else if (e == PASS)
+    {
+        if (side == BLACK)
+        {
+            font_render(m, b->msg, "WHITE: PASS");
+        }
+        else
+        {
+            font_render(m, b->msg, "BLACK: PASS");
+        }
+    }
+}
+
+void board_player_event(Board *b, int x, int y, disk_color *side, Master *m, b_event *e)
+{
+    if (!pos_hover((pos){b->x, b->y}, (pos){b->length, b->length}, (pos){x, y}))
+    {
+        return;
+    }
+
+    int i = (x - b->x) / (b->tile_size + 1);
+    int j = (y - b->y) / (b->tile_size + 1);
+
+    if (b->disks[i][j].color == VALID && img_hover(&b->disks[i][j].img, x, y))
+    {
+        *e = BASIC;
+        b->side[*side]++;
+        board_clear(b, m, true);
+        board_set_color(&b->disks[i][j], *side, m);
+        board_raycast(b, (pos){j, i}, *side, true, m);
+        *side = board_flip_color(*side);
+        board_set_valid(b, *side, m);
+
+        if (b->valid_count == 0)
+        {
+            *side = board_flip_color(*side);
+            board_set_valid(b, *side, m);
+            if (b->valid_count == 0)
+                *e = END;
+            else
+                *e = PASS;
+        }
+    }
+}
+
+void board_AI_event(Board *b, disk_color *side, Master *m, b_event *e)
+{
+    minimax(b, 0, INT32_MIN, INT32_MAX, false, m);
+    *side = board_flip_color(*side);
+    board_set_valid(b, *side, m);
+
     if (b->valid_count == 0)
     {
         *side = board_flip_color(*side);
         board_set_valid(b, *side, m);
         if (b->valid_count == 0)
-        {
-            *side = board_flip_color(*side);
-            disk_color winner = board_more(b);
-            if (winner == BLACK)
-            {
-                font_render(m, b->msg, "BLACK win");
-            }
-            else if (winner == WHITE)
-            {
-                font_render(m, b->msg, "WHITE win");
-            }
-            else
-                font_render(m, b->msg, "DRAW");
-            
-        }
+            *e = END;
         else
-        {
-            if (*side == BLACK)
-            {
-                font_render(m, b->msg, "WHITE: PASS");
-            }
-            else
-            {
-                font_render(m, b->msg, "BLACK: PASS");
-            }
-        }
+            *e = PASS;
     }
-}
-
-void board_event(Board *b, int x, int y, disk_color *side, Master *m)
-{
-    if (*side == BLACK)
-    {
-        if (!pos_hover((pos){b->x, b->y}, (pos){b->length, b->length}, (pos){x, y}))
-        {
-            board_render(m, b);
-            return;
-        }
-
-        int i = (x - b->x) / (b->tile_size + 1);
-        int j = (y - b->y) / (b->tile_size + 1);
-
-        if (b->disks[i][j].color == VALID && img_hover(&b->disks[i][j].img, x, y))
-        {
-            b->side[*side]++;
-            board_clear(b, m, true);
-            board_set_color(&b->disks[i][j], *side, m);
-            board_raycast(b, (pos){j, i}, *side, true, m);
-            *side = board_flip_color(*side);
-            board_set_valid(b, *side, m);
-        }
-    }
-    else
-    {
-        board_render(m, b);
-        SDL_RenderPresent(m->renderer);
-
-        minimax(b, 0, INT32_MIN, INT32_MAX, false, m);
-        *side = board_flip_color(*side);
-        board_set_valid(b, *side, m);
-    }
-
-    board_print_event(b, m, side);
-
-    if (*side == WHITE)
-        board_event(b, x, y, side, m);
-    board_render(m, b);
 }
 
 disk_color board_flip_color(disk_color c)
@@ -279,7 +282,7 @@ Disk board_create_disk(int x, int y, disk_color c, Master *m)
     return d;
 }
 
-void board_render(Master *m, Board *b)
+void board_render(Master *m, Board *b, disk_color c, b_event e)
 {
     for (int i = 0; i < b->tile_count; i++)
     {
@@ -295,6 +298,9 @@ void board_render(Master *m, Board *b)
             }
         }
     }
+
+    board_print_event(b, m, c, e);
+
     char temp[50];
     sprintf(temp, "WHITE: %d", b->side[WHITE]);
     font_render(m, (pos){b->x + b->length / 2, b->y - 100}, temp);

@@ -9,6 +9,10 @@
 #include "font.h"
 #define TILECOUNT 8
 
+typedef enum b_event{
+    BASIC, PASS, END
+}b_event;
+
 typedef enum disk_color{
     WHITE, BLACK, VALID, NONE
 }disk_color;
@@ -37,7 +41,10 @@ disk_color board_more(Board* b);
 Board board_init(int board_length, Master* m);
 
 //-
-void board_event(Board* b, int x, int y, disk_color* side, Master* m);
+void board_player_event(Board* b, int x, int y, disk_color* side, Master* m, b_event *e);
+
+//-
+void board_AI_event(Board* b, disk_color* side, Master* m, b_event *e);
 
 //-
 bool board_raycast(Board* b, pos p, disk_color c, bool flip, Master* m);
@@ -52,7 +59,7 @@ disk_color board_flip_color(disk_color c);
 void board_set_valid(Board* b, disk_color c, Master* m);
 
 //-
-void board_print_event(Board *b, Master *m, disk_color *side);
+void board_print_event(Board *b, Master *m, disk_color c, b_event e);
 
 //-
 void board_default(Board* b, Master* m);
@@ -70,9 +77,6 @@ int minimax(Board* b, int depth, int alpha, int beta, bool maximizing, Master* m
 Disk board_create_disk(int x, int y, disk_color color, Master* m);
 
 //-
-void board_destruct(Board* b);
-
-//-
-void board_render(Master* m, Board* b);
+void board_render(Master* m, Board* b, disk_color c, b_event e);
 
 #endif

@@ -3,7 +3,6 @@
 
 #include <SDL2/SDL.h>
 #include "image.h"
-#include "board.h"
 #include "master.h"
 
 typedef enum button_id
@@ -28,7 +27,7 @@ void button_press(Button* b, button_id id);
 
 void button_ctrl_init(Button* b, Master* m);
 
-void button_event(int x, int y, Button* b, Master* m, Board* board);
+void button_event(int x, int y, Button* b, Master* m);
 
 //-
 void button_render_all(Button* b, Master* m);

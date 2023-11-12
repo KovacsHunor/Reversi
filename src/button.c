@@ -26,7 +26,7 @@ bool button_pressable(Button* b, button_id id, int x, int y){
     return b[id].img.visible && !b[id].pressed && img_hover(&b[id].img, x, y);
 }
 
-void button_event(int x, int y, Button* b, Master* m, Board* board){
+void button_event(int x, int y, Button* b, Master* m){
     if (img_hover(&b[MENU].img, x, y)){
 
         for (int i = 1; i < SIZE; i++)

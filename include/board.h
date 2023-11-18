@@ -7,6 +7,7 @@
 #include "image.h"
 #include "utility.h"
 #include "font.h"
+#include "debugmalloc.h"
 #define TILECOUNT 8
 
 typedef enum b_event{
@@ -19,7 +20,7 @@ typedef enum disk_color{
 
 typedef struct Disk{
     disk_color color;
-    Image img;
+    pos p;
 }Disk;
 
 typedef struct Board{
@@ -41,16 +42,19 @@ disk_color board_more(Board* b);
 Board board_init(int board_length, Master* m);
 
 //-
-void board_player_event(Board* b, int x, int y, disk_color* side, Master* m, b_event *e);
+void board_put_disk(Board* b, pos p, Master* m, disk_color side);
 
 //-
-void board_AI_event(Board* b, disk_color* side, Master* m, b_event *e);
+void board_after_move(Board* b, disk_color *side, Master* m, b_event* e);
 
 //-
 bool board_raycast(Board* b, pos p, disk_color c, bool flip, Master* m);
 
 //-
 bool board_rec_valid(Board* b, pos p, pos v, disk_color c, bool first, bool flip, Master* m);
+
+//-
+void board_render_disk(Disk *d, pos p, Master *m);
 
 //-
 disk_color board_flip_color(disk_color c);

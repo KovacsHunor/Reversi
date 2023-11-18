@@ -1,6 +1,7 @@
 #ifndef UTILITY_H
 #define UTILITY_H
 #include <stdbool.h>
+#include "debugmalloc.h"
 
 typedef struct pos{
     int x;

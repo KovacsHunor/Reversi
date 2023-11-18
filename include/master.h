@@ -3,6 +3,11 @@
 
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
+#include "debugmalloc.h"
+
+typedef enum State{
+    GAME, HISTORY, PREV
+}State;
 
 typedef struct Master{
     SDL_Window *window;
@@ -10,6 +15,8 @@ typedef struct Master{
     int width;
     int height;
     Uint32 mode;
+
+    State state;
 }Master;
 
 Master master_init(int width, int height, Uint32 mode);

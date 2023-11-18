@@ -6,6 +6,9 @@ bool img_hover(Image* img, int x, int y){
 
 Image img_init(int x, int y, char* path, Master* m, bool visible){
     Image img = (Image){x, y, 0, 0, IMG_LoadTexture(m->renderer, path), visible};
+    if(img.sprite == NULL){
+        printf("img loading error");
+    }
     SDL_QueryTexture(img.sprite, NULL, NULL, &(img.w), &(img.h));
     return img;
 }

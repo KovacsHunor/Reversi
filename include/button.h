@@ -4,12 +4,15 @@
 #include <SDL2/SDL.h>
 #include "image.h"
 #include "master.h"
+#include "debugmalloc.h"
 
 typedef enum button_id
 {
     MENU,
     PLAY,
-    HISTORY,
+    B_HISTORY,
+    FW,
+    BW,
     SIZE
 }button_id;
 
@@ -19,13 +22,20 @@ typedef struct Button{
     bool pressed;
 }Button;
 
+typedef struct Controls{
+    Button arr[SIZE];
+    int size;
+}Controls;
+
+void ctrl_destroy(Controls c);
+
 bool button_pressable(Button* b, button_id id, int x, int y);
 
 void button_ctrl_default(Button* b);
 
 void button_press(Button* b, button_id id);
 
-void button_ctrl_init(Button* b, Master* m);
+void button_ctrl_init(Controls *c, Master* m);
 
 void button_event(int x, int y, Button* b, Master* m);
 

@@ -5,6 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include "master.h"
+#include "debugmalloc.h"
 
 
 typedef struct Image{

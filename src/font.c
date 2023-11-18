@@ -1,4 +1,5 @@
 #include "font.h"
+#include "debugmalloc.h"
 
 void font_render(Master *m, pos p, char* text){
     TTF_Init();
@@ -21,4 +22,5 @@ void font_render(Master *m, pos p, char* text){
     SDL_RenderCopy(m->renderer, felirat_t, NULL, &hova);
     SDL_FreeSurface(felirat);
     SDL_DestroyTexture(felirat_t);
+    TTF_CloseFont(font);
 }

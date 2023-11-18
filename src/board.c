@@ -2,7 +2,7 @@
 
 Board board_init(int board_length, Master *m)
 {
-    return (Board){.msg = (pos){200, 500}, .side = {2, 2}, .valid_count = 0, .length = board_length, .tile_count = TILECOUNT, .tile_size = board_length / TILECOUNT, .x = m->width / 2 - board_length / 2, .y = m->height / 2 - board_length / 2};
+    return (Board){.side = BLACK, .state = BASIC, .msg = (pos){200, 500}, .points = {2, 2}, .valid_count = 0, .length = board_length, .tile_count = TILECOUNT, .tile_size = board_length / TILECOUNT, .position = (pos){m->width / 2 - board_length / 2, m->height / 2 - board_length / 2}};
 }
 
 void board_default(Board *b, Master *m)
@@ -11,7 +11,7 @@ void board_default(Board *b, Master *m)
     {
         for (int x = 0; x < b->tile_count; x++)
         {
-            b->disks[y][x] = board_create_disk(b->x + x * (b->tile_size + 1), b->y + y * (b->tile_size + 1), NONE, m);
+            b->disks[y][x] = board_create_disk(b->position.x + x * (b->tile_size + 1), b->position.y + y * (b->tile_size + 1), NONE, m);
         }
     }
     board_set_color(&b->disks[3][4], WHITE, m);
@@ -43,14 +43,13 @@ disk_color board_more(Board *b)
 
 int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m)
 {
-    if (depth >= 6 || b->valid_count == 0)
+    if (depth >= 7 || b->valid_count == 0)
     {
 
-        return (b->side[BLACK] - b->side[WHITE]);
+        return (b->points[BLACK] - b->points[WHITE]);
     }
     int best = maximizing ? INT32_MIN : INT32_MAX;
     pos bestpos;
-    disk_color side = maximizing ? BLACK : WHITE;
 
     for (int y = 0; y < b->tile_count; y++)
     {
@@ -59,8 +58,9 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
             if (b->disks[y][x].color == VALID)
             {
                 Board board = *b;
-                board_put_disk(b, (pos){x, y}, m, side);
-                board_set_valid(&board, board_flip_color(side), m);
+                board_put_disk(b, (pos){x, y}, m);
+                board.side = board_flip_color(board.side);
+                board_set_valid(&board, m);
                 int value = minimax(&board, depth + 1, alpha, beta, !maximizing, m);
 
                 if (maximizing)
@@ -90,15 +90,15 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
     }
     if (depth == 0)
     {
-        b->side[side]++;
-        board_put_disk(b, (pos){bestpos.x, bestpos.y}, m, side);
+        b->points[b->side]++;
+        board_put_disk(b, (pos){bestpos.x, bestpos.y}, m);
     }
     return best;
 }
 
-void board_print_event(Board *b, Master *m, disk_color side, b_event e)
+void board_print_event(Board *b, Master *m)
 {
-    if (e == END)
+    if (b->state == END)
     {
         disk_color winner = board_more(b);
         if (winner == BLACK)
@@ -112,9 +112,9 @@ void board_print_event(Board *b, Master *m, disk_color side, b_event e)
         else
             font_render(m, b->msg, "DRAW");
     }
-    else if (e == PASS)
+    else if (b->state == PASS)
     {
-        if (side == BLACK)
+        if (b->side == BLACK)
         {
             font_render(m, b->msg, "WHITE: PASS");
         }
@@ -134,45 +134,45 @@ disk_color board_flip_color(disk_color c)
     return c;
 }
 
-void board_after_move(Board *b, disk_color *side, Master *m, b_event *e)
+void board_after_move(Board *b, Master *m)
 {
-    *side = board_flip_color(*side);
-    board_set_valid(b, *side, m);
+    b->side = board_flip_color(b->side);
+    board_set_valid(b, m);
 
     if (b->valid_count == 0)
     {
-        *side = board_flip_color(*side);
-        board_set_valid(b, *side, m);
+        b->side = board_flip_color(b->side);
+        board_set_valid(b, m);
         if (b->valid_count == 0){
-            *e = END;
-            *side = NONE;
+            b->state = END;
         }
-        else *e = PASS;
+        else b->state = PASS;
     }
+    else b->state = BASIC;
 }
 
-void board_put_disk(Board *b, pos p, Master *m, disk_color side)
+void board_put_disk(Board *b, pos p, Master *m)
 {
     board_clear(b, m, true);
-    board_set_color(&b->disks[p.y][p.x], side, m);
-    board_raycast(b, (pos){p.x, p.y}, side, true, m);
+    board_set_color(&b->disks[p.y][p.x], b->side, m);
+    board_raycast(b, (pos){p.x, p.y}, true, m);
 }
 
-bool board_rec_valid(Board *b, pos p, pos v, disk_color c, bool first, bool flip, Master *m)
+bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip, Master *m)
 {
     if (p.x >= 0 && p.x < b->tile_count && p.y >= 0 && p.y < b->tile_count)
     {
         disk_color current = b->disks[p.y][p.x].color;
-        if (!first && current == c)
+        if (!first && current == b->side)
             return true;
-        if (current == board_flip_color(c))
+        if (current == board_flip_color(b->side))
         {
-            bool found = board_rec_valid(b, pos_add(p, v), v, c, false, flip, m);
+            bool found = board_rec_valid(b, pos_add(p, v), v, false, flip, m);
             if (found && flip)
             {
-                board_set_color(&b->disks[p.y][p.x], c, m);
-                b->side[c]++;
-                b->side[current]--;
+                board_set_color(&b->disks[p.y][p.x], b->side, m);
+                b->points[b->side]++;
+                b->points[current]--;
             }
             return found;
         }
@@ -180,7 +180,7 @@ bool board_rec_valid(Board *b, pos p, pos v, disk_color c, bool first, bool flip
     return false;
 }
 
-bool board_raycast(Board *b, pos p, disk_color c, bool flip, Master *m)
+bool board_raycast(Board *b, pos p, bool flip, Master *m)
 {
     bool valid = false;
     for (int i = -1; i <= 1; i++)
@@ -190,21 +190,21 @@ bool board_raycast(Board *b, pos p, disk_color c, bool flip, Master *m)
             if (i != 0 || j != 0)
             {
                 pos v = {i, j};
-                valid |= board_rec_valid(b, pos_add(p, v), v, c, true, flip, m);
+                valid |= board_rec_valid(b, pos_add(p, v), v, true, flip, m);
             }
         }
     }
     return valid;
 }
 
-void board_set_valid(Board *b, disk_color c, Master *m)
+void board_set_valid(Board *b, Master *m)
 {
     b->valid_count = 0;
     for (int y = 0; y < b->tile_count; y++)
     {
         for (int x = 0; x < b->tile_count; x++)
         {
-            if (b->disks[y][x].color == NONE && board_raycast(b, (pos){x, y}, c, false, m))
+            if (b->disks[y][x].color == NONE && board_raycast(b, (pos){x, y}, false, m))
             {
                 board_set_color(&b->disks[y][x], VALID, m);
                 b->valid_count++;
@@ -251,13 +251,13 @@ Disk board_create_disk(int x, int y, disk_color c, Master *m)
     return d;
 }
 
-void board_render(Master *m, Board *b, disk_color c, b_event e)
+void board_render(Master *m, Board *b)
 {
     for (int i = 0; i < b->tile_count; i++)
     {
         for (int j = 0; j < b->tile_count; j++)
         {
-            SDL_Rect r = {i * (b->tile_size + 1) + b->x, j * (b->tile_size + 1) + b->y, b->tile_size, b->tile_size};
+            SDL_Rect r = {i * (b->tile_size + 1) + b->position.x, j * (b->tile_size + 1) + b->position.y, b->tile_size, b->tile_size};
             SDL_SetRenderDrawColor(m->renderer, 0, (i + j) % 2 ? 120 : 130, 0, 255);
             SDL_RenderFillRect(m->renderer, &r);
 
@@ -268,14 +268,14 @@ void board_render(Master *m, Board *b, disk_color c, b_event e)
         }
     }
 
-    board_print_event(b, m, c, e);
+    board_print_event(b, m);
 
     char temp[50];
-    sprintf(temp, "WHITE: %d", b->side[WHITE]);
-    font_render(m, (pos){b->x + b->length / 2, b->y - 100}, temp);
+    sprintf(temp, "WHITE: %d", b->points[WHITE]);
+    font_render(m, (pos){b->position.x + b->length / 2, b->position.y - 100}, temp);
 
-    sprintf(temp, "BLACK: %d", b->side[BLACK]);
-    font_render(m, (pos){b->x + b->length / 2, b->y + b->length + 100}, temp);
+    sprintf(temp, "BLACK: %d", b->points[BLACK]);
+    font_render(m, (pos){b->position.x + b->length / 2, b->position.y + b->length + 100}, temp);
 
     SDL_SetRenderDrawColor(m->renderer, 0, 0, 0, 255);
 }

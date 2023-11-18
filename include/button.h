@@ -5,6 +5,7 @@
 #include "image.h"
 #include "master.h"
 #include "debugmalloc.h"
+#include "game.h"
 
 typedef enum button_id
 {
@@ -31,13 +32,15 @@ void ctrl_destroy(Controls c);
 
 bool button_pressable(Button* b, button_id id, int x, int y);
 
+void button_tasks(Controls *c, Game *g, Master *m);
+
 void button_ctrl_default(Button* b);
 
 void button_press(Button* b, button_id id);
 
 void button_ctrl_init(Controls *c, Master* m);
 
-void button_event(int x, int y, Button* b, Master* m);
+bool button_event(int x, int y, Button* b, Master* m);
 
 //-
 void button_render_all(Button* b, Master* m);

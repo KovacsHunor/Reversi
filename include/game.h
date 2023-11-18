@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <unistd.h>
 #include "board.h"
 
 typedef struct BoardList{
@@ -20,14 +21,13 @@ typedef struct Game{
     BoardList* history_board;
 }Game;
 
-Game game_init(disk_color player_c, Opponent opp);
+void game_init(Game* g, disk_color player_c, Opponent opp, Master* m);
 
 //-
-void game_player_event(Game* g, int x, int y, disk_color* side, Master* m, b_event *e);
+bool game_player_event(Game* g, int x, int y, Master* m);
 
 //-
-void game_AI_event(Game* g, disk_color* side, Master* m, b_event *e);
-
+void game_AI_event(Game* g, Master* m);
 
 void game_add_position(Game* g, Master* m);
 

@@ -31,10 +31,8 @@ int main()
     SDL_SetRenderDrawColor(master.renderer, 0, 0, 0, 255);
     SDL_RenderClear(master.renderer);
 
-    Game game = game_init(BLACK, AI);
-    game_add_position(&game, &master);
-    board_default(&game.list->board, &master);
-    board_set_valid(&game.list->board, BLACK, &master);
+    Game game;
+    game_init(&game, BLACK, AI, &master);
 
     Controls controls;
     button_ctrl_init(&controls, &master);
@@ -42,9 +40,8 @@ int main()
 
     SDL_RenderPresent(master.renderer);
 
-    b_event e = BASIC;
-    disk_color side = BLACK;
     bool quit = false;
+    bool draw = false;
     while (!quit)
     {
         SDL_Event event;
@@ -54,47 +51,30 @@ int main()
         {
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
+            
+            button_tasks(&controls, &game, &master);
 
-            button_render_all(controls.arr, &master);
-            if (controls.arr[PLAY].pressed)
-                board_render(&master, &game.history_board->board, side, e);
-            if (controls.arr[BW].pressed)
+            if (draw)
             {
-                if (game.history_board->former != NULL)
-                {
-                    game.history_board = game.history_board->former;
-                    master.state = PREV;
-                }
-                controls.arr[BW].pressed = false;
+                draw = false;
+                SDL_RenderPresent(master.renderer);
             }
-            if (controls.arr[FW].pressed)
-            {
-                
-                if (game.history_board->next != NULL)
-                {
-                    game.history_board = game.history_board->next;
-                }
-                if (game.history_board->next == NULL) //looks bad, pretty sure can be done better
-                {
-                    master.state = GAME; // later -> function for continuing from position
-                }
-                controls.arr[FW].pressed = false;
-            }
-            SDL_RenderPresent(master.renderer);
 
-            if (controls.arr[PLAY].pressed && side == WHITE && master.state == GAME)
+            if (controls.arr[PLAY].pressed && game.list->board.side == WHITE && game.list->board.state != END && master.state == GAME)
             {
-                game_AI_event(&game, &side, &master, &e);
+                game_AI_event(&game, &master);
+                draw = true;
             }
             break;
         case SDL_MOUSEBUTTONUP:
             if (event.button.button == SDL_BUTTON_LEFT)
             {
                 button_event(event.button.x, event.button.y, controls.arr, &master);
-                if (controls.arr[PLAY].pressed && side == BLACK && master.state == GAME)
+                if (controls.arr[PLAY].pressed && game.list->board.side == BLACK && master.state == GAME)
                 {
-                    game_player_event(&game, event.button.x, event.button.y, &side, &master, &e);
+                    game_player_event(&game, event.button.x, event.button.y, &master);
                 }
+                draw = true;
             }
             break;
         case SDL_QUIT:

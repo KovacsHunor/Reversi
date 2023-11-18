@@ -1,8 +1,11 @@
 #include "game.h"
 
-Game game_init(disk_color player_c, Opponent opp)
+void game_init(Game* g, disk_color player_c, Opponent opp, Master* m)
 {
-    return (Game){.list = NULL, .player_color = player_c, .opponent = opp};
+    *g = (Game){.list = NULL, .player_color = player_c, .opponent = opp};
+    game_add_position(g, m);
+    board_default(&g->list->board, m);
+    board_set_valid(&g->list->board, m);
 }
 
 void game_add_position(Game *g, Master* m)
@@ -22,34 +25,37 @@ void game_add_position(Game *g, Master* m)
     g->history_board = g->list;
 }
 
-void game_player_event(Game *g, int x, int y, disk_color *side, Master *m, b_event *e)
+bool game_player_event(Game *g, int x, int y, Master *m)
 {
-    if (!pos_hover((pos){g->list->board.x, g->list->board.y}, (pos){g->list->board.length, g->list->board.length}, (pos){x, y}))
+    if (!pos_hover((pos){g->list->board.position.x, g->list->board.position.y}, (pos){g->list->board.length, g->list->board.length}, (pos){x, y}))
     {
-        return;
+        return false;
     }
 
-    int i = (x - g->list->board.x) / (g->list->board.tile_size + 1);
-    int j = (y - g->list->board.y) / (g->list->board.tile_size + 1);
+    int i = (x - g->list->board.position.x) / (g->list->board.tile_size + 1);
+    int j = (y - g->list->board.position.y) / (g->list->board.tile_size + 1);
 
+    // 0<i<8, 0<j<8
     if (g->list->board.disks[j][i].color == VALID)
     {
         game_add_position(g, m);
 
-        *e = BASIC;
-        g->list->board.side[*side]++;
+        //g->list->board.state = BASIC;
+        g->list->board.points[g->list->board.side]++;
 
-        board_put_disk(&g->list->board, (pos){i, j}, m, *side);
+        board_put_disk(&g->list->board, (pos){i, j}, m);
         
-        board_after_move(&g->list->board, side, m, e);
+        board_after_move(&g->list->board, m);
+        return true;
     }
+    return false;
 }
 
-void game_AI_event(Game *g, disk_color *side, Master *m, b_event *e)
+void game_AI_event(Game *g, Master *m)
 {
     game_add_position(g, m);
     minimax(&g->list->board, 0, INT32_MIN, INT32_MAX, false, m);
-    board_after_move(&g->list->board, side, m, e);
+    board_after_move(&g->list->board, m);
 }
 
 void game_list_destroy(BoardList *list)

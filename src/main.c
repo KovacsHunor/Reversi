@@ -51,11 +51,14 @@ int main()
         {
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
-            
+
             button_tasks(&controls, &game, &master);
 
             if (draw)
             {
+                button_render_all(controls.arr, &master);
+                if (controls.arr[PLAY].pressed)
+                    board_render(&master, &game.history_board->board);
                 draw = false;
                 SDL_RenderPresent(master.renderer);
             }
@@ -69,12 +72,11 @@ int main()
         case SDL_MOUSEBUTTONUP:
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                button_event(event.button.x, event.button.y, controls.arr, &master);
+                draw = button_event(event.button.x, event.button.y, controls.arr, &master);
                 if (controls.arr[PLAY].pressed && game.list->board.side == BLACK && master.state == GAME)
                 {
-                    game_player_event(&game, event.button.x, event.button.y, &master);
+                    draw |= game_player_event(&game, event.button.x, event.button.y, &master);
                 }
-                draw = true;
             }
             break;
         case SDL_QUIT:

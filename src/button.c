@@ -52,12 +52,6 @@ void button_tasks(Controls *c, Game *g, Master *m)
         if (g->history_board->former != NULL)
         {
             g->history_board = g->history_board->former;
-            int c = 0;
-            while(g->history_board->board.state == END){
-                g->history_board = g->history_board->former;
-                c++;
-            }
-            printf("%d", c);
             m->state = PREV;
         }
         c->arr[BW].pressed = false;
@@ -74,9 +68,6 @@ void button_tasks(Controls *c, Game *g, Master *m)
         }
         c->arr[FW].pressed = false;
     }
-    button_render_all(c->arr, m);
-    if (c->arr[PLAY].pressed)
-        board_render(m, &g->history_board->board);
 }
 
 bool button_event(int x, int y, Button *b, Master *m)

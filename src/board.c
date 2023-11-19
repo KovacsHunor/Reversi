@@ -43,9 +43,8 @@ disk_color board_more(Board *b)
 
 int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m)
 {
-    if (depth >= 7 || b->valid_count == 0)
+    if (depth >= 6 || b->valid_count == 0)
     {
-
         return (b->points[BLACK] - b->points[WHITE]);
     }
     int best = maximizing ? INT32_MIN : INT32_MAX;
@@ -58,9 +57,8 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
             if (b->disks[y][x].color == VALID)
             {
                 Board board = *b;
-                board_put_disk(b, (pos){x, y}, m);
-                board.side = board_flip_color(board.side);
-                board_set_valid(&board, m);
+                board_put_disk(&board, (pos){x, y}, m);
+                board_after_move(&board, m);
                 int value = minimax(&board, depth + 1, alpha, beta, !maximizing, m);
 
                 if (maximizing)
@@ -137,6 +135,7 @@ disk_color board_flip_color(disk_color c)
 void board_after_move(Board *b, Master *m)
 {
     b->side = board_flip_color(b->side);
+    board_clear(b, m, true);
     board_set_valid(b, m);
 
     if (b->valid_count == 0)

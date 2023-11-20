@@ -41,13 +41,13 @@ disk_color board_more(Board *b)
     return NONE;
 }
 
-int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m)
+int minimax(Board *b, int depth, int alpha, int beta, Master *m)
 {
     if (depth >= 6 || b->valid_count == 0)
     {
         return (b->points[BLACK] - b->points[WHITE]);
     }
-    int best = maximizing ? INT32_MIN : INT32_MAX;
+    int best = b->side == BLACK ? INT32_MIN : INT32_MAX;
     pos bestpos;
 
     for (int y = 0; y < b->tile_count; y++)
@@ -59,9 +59,9 @@ int minimax(Board *b, int depth, int alpha, int beta, bool maximizing, Master *m
                 Board board = *b;
                 board_put_disk(&board, (pos){x, y}, m);
                 board_after_move(&board, m);
-                int value = minimax(&board, depth + 1, alpha, beta, !maximizing, m);
+                int value = minimax(&board, depth + 1, alpha, beta, m);
 
-                if (maximizing)
+                if (b->side == BLACK)
                 {
                     if (best < value)
                     {

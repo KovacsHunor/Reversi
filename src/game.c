@@ -54,7 +54,7 @@ bool game_player_event(Game *g, int x, int y, Master *m)
 void game_AI_event(Game *g, Master *m)
 {
     game_add_position(g, m);
-    minimax(&g->list->board, 0, INT32_MIN, INT32_MAX, false, m);
+    minimax(&g->list->board, 0, INT32_MIN, INT32_MAX, m);
     board_after_move(&g->list->board, m);
 }
 

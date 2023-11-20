@@ -79,7 +79,7 @@ void board_set_color(Disk* d, disk_color c, Master* m);
 void board_clear(Board* b, Master* m, bool only_valid);
 
 //-
-int minimax(Board* b, int depth, int alpha, int beta, bool maximizing, Master* m);
+int minimax(Board* b, int depth, int alpha, int beta, Master* m);
 
 //-
 Disk board_create_disk(int x, int y, disk_color color, Master* m);

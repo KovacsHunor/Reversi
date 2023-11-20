@@ -52,18 +52,18 @@ int main()
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
 
-            button_tasks(&controls, &game, &master);
+            draw |= button_tasks(&controls, &game, &master);
 
             if (draw)
             {
-                button_render_all(controls.arr, &master);
                 if (controls.arr[PLAY].pressed)
                     board_render(&master, &game.history_board->board);
+                button_render_all(controls.arr, &master);
                 draw = false;
                 SDL_RenderPresent(master.renderer);
             }
 
-            if (controls.arr[PLAY].pressed && game.list->board.side == WHITE && game.list->board.state != END && master.state == GAME)
+            if (controls.arr[PLAY].pressed && game.list->board.side == board_flip_color(game.player_color) && game.opponent == AI && game.list->board.state != END && master.state == GAME)
             {
                 game_AI_event(&game, &master);
                 draw = true;
@@ -72,8 +72,8 @@ int main()
         case SDL_MOUSEBUTTONUP:
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                draw = button_event(event.button.x, event.button.y, controls.arr, &master);
-                if (controls.arr[PLAY].pressed && game.list->board.side == BLACK && master.state == GAME)
+                draw |= button_event(event.button.x, event.button.y, controls.arr, &master);
+                if (controls.arr[PLAY].pressed && master.state == GAME && ((game.opponent == AI && game.list->board.side == game.player_color)||game.opponent == HUMAN))
                 {
                     draw |= game_player_event(&game, event.button.x, event.button.y, &master);
                 }

@@ -6,7 +6,7 @@
 #include "debugmalloc.h"
 
 typedef enum State{
-    GAME, HISTORY, PREV
+    OPPONENT, COLOR, GAME, HISTORY, PREV
 }State;
 
 typedef struct Master{

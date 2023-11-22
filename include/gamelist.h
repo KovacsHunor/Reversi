@@ -4,7 +4,7 @@
 #include "game.h"
 
 typedef struct GameList{
-    Game game;
+    Game* game;
     struct GameList* former;
     struct GameList* next;
 }GameList;
@@ -12,5 +12,7 @@ typedef struct GameList{
 void gamelist_add(GameList** list, Game* g);
 
 void gamelist_destroy(GameList* list);
+
+void gamelist_new(GameList** listp, Master* m);
 
 #endif

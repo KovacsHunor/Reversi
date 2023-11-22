@@ -32,11 +32,8 @@ int main()
     SDL_SetRenderDrawColor(master.renderer, 0, 0, 0, 255);
     SDL_RenderClear(master.renderer);
 
-    Game game;
-    game_init(&game, BLACK, AI, &master);
-
     GameList* list = NULL;
-    gamelist_add(&list, &game);
+    gamelist_new(&list, &master);
 
     Controls controls;
     button_ctrl_init(&controls, &master);
@@ -56,20 +53,20 @@ int main()
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
 
-            draw |= button_tasks(&controls, &game, &master);
+            draw |= button_tasks(&controls, &list, &master);
 
             if (draw)
             {
                 if (controls.arr[PLAY].pressed)
-                    board_render(&master, &game.history_board->board);
+                    board_render(&master, &list->game->history_board->board);
                 button_render_all(controls.arr, &master);
                 draw = false;
                 SDL_RenderPresent(master.renderer);
             }
 
-            if (controls.arr[PLAY].pressed && game.list->board.side == board_flip_color(game.player_color) && game.opponent == AI && game.list->board.state != END && master.state == GAME)
+            if (list->game->state == MATCH && list->game->list->board.side == board_flip_color(list->game->player_color) && list->game->opponent == AI && list->game->list->board.state != END && master.state == GAME)
             {
-                game_AI_event(&game, &master);
+                game_AI_event(list->game, &master);
                 draw = true;
             }
             break;
@@ -77,9 +74,9 @@ int main()
             if (event.button.button == SDL_BUTTON_LEFT)
             {
                 draw |= button_event(event.button.x, event.button.y, controls.arr, &master);
-                if (controls.arr[PLAY].pressed && master.state == GAME && ((game.opponent == AI && game.list->board.side == game.player_color)||game.opponent == HUMAN))
+                if (list->game->state == MATCH && master.state == GAME && ((list->game->opponent == AI && list->game->list->board.side == list->game->player_color)||list->game->opponent == HUMAN))
                 {
-                    draw |= game_player_event(&game, event.button.x, event.button.y, &master);
+                    draw |= game_player_event(list->game, event.button.x, event.button.y, &master);
                 }
                 draw = true;
             }
@@ -89,7 +86,7 @@ int main()
             break;
         }
     }
-    game_destroy(&game);
+    gamelist_destroy(list);
     ctrl_destroy(controls);
     SDL_RemoveTimer(id);
     SDL_Quit();

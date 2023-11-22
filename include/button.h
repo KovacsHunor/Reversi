@@ -7,6 +7,7 @@
 #include "master.h"
 #include "debugmalloc.h"
 #include "game.h"
+#include "gamelist.h"
 
 typedef enum button_id
 {
@@ -19,6 +20,7 @@ typedef enum button_id
     ROBOT,
     B_BLACK,
     B_WHITE,
+    B_NEW,
     SIZE
 }button_id;
 
@@ -37,7 +39,7 @@ void ctrl_destroy(Controls c);
 
 bool button_pressable(Button* b, button_id id, int x, int y);
 
-bool button_tasks(Controls *c, Game *g, Master *m);
+bool button_tasks(Controls *c, GameList **list, Master *m);
 
 void button_ctrl_default(Button* b);
 

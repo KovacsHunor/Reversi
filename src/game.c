@@ -69,4 +69,5 @@ void game_list_destroy(BoardList *list)
 void game_destroy(Game *g)
 {
     game_list_destroy(g->list);
+    free(g);
 }

@@ -14,11 +14,16 @@ typedef enum Opponent{
     HUMAN, AI
 }Opponent;
 
+typedef enum Game_state{
+    MATCH, OPPONENT, COLOR, PREV
+}Game_state;
+
 typedef struct Game{
     BoardList* list;
     disk_color player_color;
     Opponent opponent;
     BoardList* history_board;
+    Game_state state;
 }Game;
 
 void game_init(Game* g, disk_color player_c, Opponent opp, Master* m);

@@ -77,6 +77,7 @@ int main()
                 {
                     draw |= game_player_event(&game, event.button.x, event.button.y, &master);
                 }
+                draw = true;
             }
             break;
         case SDL_QUIT:

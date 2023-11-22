@@ -29,7 +29,7 @@ void button_ctrl_default(Button *b)
             img_texture_swap(&b[i].sw_sprite, &b[i].img.sprite);
             b[i].pressed = false;
         }
-        if (i == FW || i == BW)
+        if (i != B_HISTORY && i != PLAY)
         {
             b[i].img.visible = false;
         }
@@ -51,79 +51,74 @@ void ctrl_destroy(Controls c)
 
 bool button_tasks(Controls *c, Game *g, Master *m)
 {
-    if (m->state == GAME || m->state == PREV)
+    if (m->state == GAME)
     {
-        c->arr[BW].img.visible = true;
-        c->arr[FW].img.visible = true;
-        if (c->arr[BW].pressed)
+        if (g->state == MATCH || g->state == PREV)
         {
-            if (g->history_board->former != NULL)
+            c->arr[BW].img.visible = true;
+            c->arr[FW].img.visible = true;
+            if (c->arr[BW].pressed)
             {
-                g->history_board = g->history_board->former;
-                m->state = PREV;
+                if (g->history_board->former != NULL)
+                {
+                    g->history_board = g->history_board->former;
+                    g->state = PREV;
+                }
+                c->arr[BW].pressed = false;
             }
-            c->arr[BW].pressed = false;
-        }
-        else if (c->arr[FW].pressed)
-        {
-            if (g->history_board->next != NULL)
+            else if (c->arr[FW].pressed)
             {
-                g->history_board = g->history_board->next;
+                if (g->history_board->next != NULL)
+                {
+                    g->history_board = g->history_board->next;
+                }
+                if (g->history_board->next == NULL) // looks bad, pretty sure can be done better
+                {
+                    g->state = MATCH; // later -> function for continuing from position
+                }
+                c->arr[FW].pressed = false;
             }
-            if (g->history_board->next == NULL) // looks bad, pretty sure can be done better
-            {
-                m->state = GAME; // later -> function for continuing from position
-            }
-            c->arr[FW].pressed = false;
-        }
-    }
-    else
-    {
-        c->arr[FW].img.visible = false;
-        c->arr[BW].img.visible = false;
-    }
-    if (m->state == OPPONENT)
-    {
-        c->arr[PERSON].img.visible = true;
-        c->arr[ROBOT].img.visible = true;
-        if (c->arr[PERSON].pressed)
-        {
-            g->opponent = HUMAN;
-            m->state = GAME;
-        }
-        else if (c->arr[ROBOT].pressed)
-        {
-            g->opponent = AI;
-            m->state = COLOR;
         }
         else
-            return false;
-        return true;
-    }
-    else if (c->arr[PERSON].img.visible == true)
-    {
-        c->arr[PERSON].img.visible = false;
-        c->arr[ROBOT].img.visible = false;
-        return true;
-    }
-    if (m->state == COLOR)
-    {
-        c->arr[B_BLACK].img.visible = true;
-        c->arr[B_WHITE].img.visible = true;
-        if (c->arr[B_BLACK].pressed)
-            g->player_color = BLACK;
-        else if (c->arr[B_WHITE].pressed)
-            g->player_color = WHITE;
-        else
+        {
+            c->arr[FW].img.visible = false;
+            c->arr[BW].img.visible = false;
+        }
+        if (g->state == OPPONENT)
+        {
+            c->arr[PERSON].img.visible = true;
+            c->arr[ROBOT].img.visible = true;
+            if (c->arr[PERSON].pressed)
+            {
+                g->opponent = HUMAN;
+                g->state = MATCH;
+            }
+            else if (c->arr[ROBOT].pressed)
+            {
+                g->opponent = AI;
+                g->state = COLOR;
+            }
+            else
+                return false;
+            c->arr[PERSON].img.visible = false;
+            c->arr[ROBOT].img.visible = false;
             return true;
-        m->state = GAME;
-        return true;
-    }
-    else if (c->arr[B_BLACK].img.visible == true)
-    {
-        c->arr[B_BLACK].img.visible = false;
-        c->arr[B_WHITE].img.visible = false;
-        return true;
+        }
+        if (g->state == COLOR)
+        {
+            c->arr[B_BLACK].img.visible = true;
+            c->arr[B_WHITE].img.visible = true;
+            if (c->arr[B_BLACK].pressed)
+                g->player_color = BLACK;
+            else if (c->arr[B_WHITE].pressed)
+                g->player_color = WHITE;
+            else
+                return true;
+            g->state = MATCH;
+            c->arr[B_BLACK].img.visible = false;
+            c->arr[B_WHITE].img.visible = false;
+            return true;
+        }
     }
     return false;
 }
@@ -149,8 +144,11 @@ bool button_event(int x, int y, Button *b, Master *m)
             {
                 button_ctrl_default(b);
                 button_press(b, i);
+                if(i == PLAY) m->state = GAME;
+                if(i == B_HISTORY) m->state = HISTORY;
             }
-            else{
+            else
+            {
                 b[i].pressed = true;
             }
         }

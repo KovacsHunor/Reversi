@@ -10,6 +10,7 @@
 #include "board.h"
 #include "game.h"
 #include "button.h"
+#include "gamelist.h"
 
 #define BOARDSIZE 8
 
@@ -33,6 +34,9 @@ int main()
 
     Game game;
     game_init(&game, BLACK, AI, &master);
+
+    GameList* list = NULL;
+    gamelist_add(&list, &game);
 
     Controls controls;
     button_ctrl_init(&controls, &master);

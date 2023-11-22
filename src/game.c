@@ -2,7 +2,7 @@
 
 void game_init(Game* g, disk_color player_c, Opponent opp, Master* m)
 {
-    *g = (Game){.state = OPPONENT, .list = NULL, .player_color = player_c, .opponent = opp};
+    *g = (Game){.date = time(NULL), .state = OPPONENT, .list = NULL, .player_color = player_c, .opponent = opp};
     game_add_position(g, m);
     board_default(&g->list->board, m);
     board_set_valid(&g->list->board, m);

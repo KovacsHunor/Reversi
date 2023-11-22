@@ -1,8 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <unistd.h>
 #include "board.h"
+#include <time.h>
 
 typedef struct BoardList{
     Board board;
@@ -19,6 +19,7 @@ typedef enum Game_state{
 }Game_state;
 
 typedef struct Game{
+    time_t date;    //epoch
     BoardList* list;
     disk_color player_color;
     Opponent opponent;

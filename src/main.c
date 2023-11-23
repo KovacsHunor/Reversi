@@ -35,6 +35,8 @@ int main()
     GameList* list = NULL;
     gamelist_new(&list, &master);
 
+    GameList* mover = list;
+
     Controls controls;
     button_ctrl_init(&controls, &master);
     button_render_all(controls.arr, &master);
@@ -53,8 +55,10 @@ int main()
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
 
-            draw |= button_tasks(&controls, &list, &master);
-
+            draw |= button_tasks(&controls, &list, &mover, &master);
+            if(master.state == HISTORY){
+                print_date(&mover->game->date);
+            }
             if (draw)
             {
                 if (controls.arr[PLAY].pressed)

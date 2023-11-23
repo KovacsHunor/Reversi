@@ -14,13 +14,15 @@ typedef enum button_id
     MENU,
     PLAY,
     B_HISTORY,
-    FW,
-    BW,
+    PREV_FW,
+    PREV_BW,
     PERSON,
     ROBOT,
     B_BLACK,
     B_WHITE,
     B_NEW,
+    HISTORY_FW,
+    HISTORY_BW,
     SIZE
 }button_id;
 
@@ -39,7 +41,7 @@ void ctrl_destroy(Controls c);
 
 bool button_pressable(Button* b, button_id id, int x, int y);
 
-bool button_tasks(Controls *c, GameList **list, Master *m);
+bool button_tasks(Controls *c, GameList **list, GameList **mover, Master *m);
 
 void button_ctrl_default(Button* b);
 

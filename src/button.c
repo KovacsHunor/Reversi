@@ -14,6 +14,7 @@ void button_ctrl_init(Controls *c, Master *m)
     c->arr[B_NEW] = (Button){img_init(200, 900, "../sprites/new.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/new.png"), false};
     c->arr[HISTORY_FW] = (Button){img_init(600, m->height - 300, "../sprites/arrow_L.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_L.png"), false};
     c->arr[HISTORY_BW] = (Button){img_init(m->width - 700, m->height - 300, "../sprites/arrow_R.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_R.png"), false};
+    c->arr[LOAD] = (Button){img_init(200, m->height - 500, "../sprites/load.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/load.png"), false};
     c->size = SIZE;
 }
 
@@ -79,17 +80,39 @@ bool button_tasks(Controls *c, GameList **listp, GameList **mover, Master *m)
                 }
                 if (list->game->history_board->next == NULL) // looks bad, pretty sure can be done better
                 {
-                    list->game->state = MATCH; // later -> function for continuing from position
+                    list->game->state = MATCH;
                 }
                 c->arr[PREV_FW].pressed = false;
             }
             else if (c->arr[B_NEW].pressed)
             {
                 gamelist_new(listp, m);
-                (*mover) = (*listp);
-                (*listp)->game->state = OPPONENT;
+                list = *listp;
+                *mover = list;
+                list->game->state = OPPONENT;
                 c->arr[B_NEW].pressed = false;
                 return true;
+            }
+            if (list->game->state == PREV)
+            {
+                c->arr[LOAD].img.visible = true;
+                if (c->arr[LOAD].pressed)
+                {
+                    c->arr[LOAD].pressed = false;
+                    Game *tempgame = (Game *)malloc(sizeof(Game));
+                    game_cpy(tempgame, list->game);
+                    gamelist_add(listp, tempgame);
+                    gamelist_tofirst(listp);
+                    list = *listp;
+                    list->game->list = list->game->history_board;
+                    game_list_fwdestroy(list->game->history_board->next);
+                    list->game->history_board->next = NULL;
+                    list->game->state = MATCH;
+                }
+            }
+            else
+            {
+                c->arr[LOAD].img.visible = false;
             }
         }
         else
@@ -157,12 +180,12 @@ bool button_tasks(Controls *c, GameList **listp, GameList **mover, Master *m)
         if (c->arr[HISTORY_BW].pressed && (*mover)->former != NULL)
         {
             (*mover) = (*mover)->former;
-            
         }
         c->arr[HISTORY_BW].pressed = false;
         c->arr[HISTORY_FW].pressed = false;
     }
-    else{
+    else
+    {
         c->arr[HISTORY_FW].img.visible = false;
         c->arr[HISTORY_BW].img.visible = false;
     }

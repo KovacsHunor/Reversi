@@ -57,9 +57,10 @@ int main()
 
             draw |= button_tasks(&controls, &list, &mover, &master);
             if(master.state == HISTORY){
+                font_render(&master, (pos){700, 500}, ctime(&mover->game->date));
                 print_date(&mover->game->date);
             }
-            if (draw)
+            if (true) //(draw)
             {
                 if (controls.arr[PLAY].pressed)
                     board_render(&master, &list->game->history_board->board);

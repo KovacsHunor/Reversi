@@ -274,7 +274,7 @@ void board_render(Master *m, Board *b)
     font_render(m, (pos){b->position.x + b->length / 2, b->position.y - 100}, temp);
 
     sprintf(temp, "BLACK: %d", b->points[BLACK]);
-    font_render(m, (pos){b->position.x + b->length / 2, b->position.y + b->length + 100}, temp);
+    font_render(m, (pos){b->position.x + b->length / 2, b->position.y + b->length + 50}, temp);
 
     SDL_SetRenderDrawColor(m->renderer, 0, 0, 0, 255);
 }

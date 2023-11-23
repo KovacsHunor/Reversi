@@ -15,4 +15,6 @@ void gamelist_destroy(GameList* list);
 
 void gamelist_new(GameList** listp, Master* m);
 
+void gamelist_tofirst(GameList** list);
+
 #endif

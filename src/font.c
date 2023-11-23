@@ -3,7 +3,7 @@
 
 void font_render(Master *m, pos p, char* text){
     TTF_Init();
-    TTF_Font *font = TTF_OpenFont("../fonts/LiberationSerif-Regular.ttf", 32);
+    TTF_Font *font = TTF_OpenFont("../fonts/LiberationSerif-Regular.ttf", 48);
     if (!font) {
         SDL_Log("Nem sikerult megnyitni a fontot! %s\n", TTF_GetError());
         exit(1);

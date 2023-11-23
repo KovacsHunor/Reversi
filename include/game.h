@@ -37,7 +37,15 @@ void game_AI_event(Game* g, Master* m);
 
 void game_add_position(Game* g, Master* m);
 
-void game_list_destroy(BoardList* list);
+void game_listcpy(BoardList** dst, BoardList* src);
+
+void game_hbcpy(Game* dst, Game* src);
+
+void game_cpy(Game* dst, Game* src);
+
+void game_list_bwdestroy(BoardList* list);
+
+void game_list_fwdestroy(BoardList* list);
 
 void game_destroy(Game* g);
 

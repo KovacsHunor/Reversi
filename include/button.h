@@ -23,6 +23,7 @@ typedef enum button_id
     B_NEW,
     HISTORY_FW,
     HISTORY_BW,
+    LOAD,
     SIZE
 }button_id;
 

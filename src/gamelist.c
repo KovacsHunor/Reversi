@@ -24,4 +24,7 @@ void gamelist_new(GameList** list, Master* m){
     Game* game = (Game*)malloc(sizeof(Game));
     game_init(game, BLACK, AI, m);
     gamelist_add(list, game);
+
+    //just test
+    print_date(&(*list)->game->date);
 }

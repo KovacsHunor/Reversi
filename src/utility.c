@@ -15,3 +15,7 @@ int max(int a, int b){
 int min(int a, int b){
     return a<b?a:b;
 }
+
+void print_date(time_t* epoch){
+    printf("%s", ctime(epoch));
+}

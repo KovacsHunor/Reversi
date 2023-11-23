@@ -1,5 +1,5 @@
 #include "game.h"
-
+#include "stdio.h"
 void game_init(Game* g, disk_color player_c, Opponent opp, Master* m)
 {
     *g = (Game){.date = time(NULL), .state = OPPONENT, .list = NULL, .player_color = player_c, .opponent = opp};

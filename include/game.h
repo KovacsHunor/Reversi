@@ -27,7 +27,7 @@ typedef struct Game{
     Game_state state;
 }Game;
 
-void game_init(Game* g, disk_color player_c, Opponent opp, Master* m);
+void game_init(Game* g, Master* m);
 
 //-
 bool game_player_event(Game* g, int x, int y, Master* m);

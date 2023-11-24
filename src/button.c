@@ -15,6 +15,9 @@ void button_ctrl_init(Controls *c, Master *m)
     c->arr[HISTORY_FW] = (Button){img_init(600, m->height - 300, "../sprites/arrow_L.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_L.png"), false};
     c->arr[HISTORY_BW] = (Button){img_init(m->width - 700, m->height - 300, "../sprites/arrow_R.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_R.png"), false};
     c->arr[LOAD] = (Button){img_init(200, m->height - 500, "../sprites/load.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/load.png"), false};
+    c->arr[CONT] = (Button){img_init(800, m->height - 300, "../sprites/load.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/load.png"), false};
+    c->arr[DELETE] = (Button){img_init(1000, m->height - 300, "../sprites/delete.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/delete.png"), false};
+    c->arr[SAVE] = (Button){img_init(200, m->height - 700, "../sprites/save.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/save.png"), false};
     c->size = SIZE;
 }
 
@@ -53,61 +56,61 @@ void ctrl_destroy(Controls c)
     }
 }
 
-bool button_tasks(Controls *c, GameList **listp, GameList **mover, Master *m)
+bool button_tasks(Controls *c, GameList **listp, Game* g, GameList **mover, Master *m)
 {
-    GameList *list = *listp;
     if (m->state == GAME)
     {
-        if (list->game->state == MATCH || list->game->state == PREV)
+        if (g->state == MATCH || g->state == PREV)
         {
             c->arr[PREV_BW].img.visible = true;
+            c->arr[SAVE].img.visible = true;
             c->arr[PREV_FW].img.visible = true;
             c->arr[B_NEW].img.visible = true;
             if (c->arr[PREV_BW].pressed)
             {
-                if (list->game->history_board->former != NULL)
+                if (g->history_board->former != NULL)
                 {
-                    list->game->history_board = list->game->history_board->former;
-                    list->game->state = PREV;
+                    g->history_board = g->history_board->former;
+                    g->state = PREV;
                 }
                 c->arr[PREV_BW].pressed = false;
             }
             else if (c->arr[PREV_FW].pressed)
             {
-                if (list->game->history_board->next != NULL)
+                if (g->history_board->next != NULL)
                 {
-                    list->game->history_board = list->game->history_board->next;
+                    g->history_board = g->history_board->next;
                 }
-                if (list->game->history_board->next == NULL) // looks bad, pretty sure can be done better
+                if (g->history_board->next == NULL) // looks bad, pretty sure can be done better
                 {
-                    list->game->state = MATCH;
+                    g->state = MATCH;
                 }
                 c->arr[PREV_FW].pressed = false;
             }
             else if (c->arr[B_NEW].pressed)
             {
-                gamelist_new(listp, m);
-                list = *listp;
-                *mover = list;
-                list->game->state = OPPONENT;
+                game_list_bwdestroy(g->list);
+                game_init(g, m);
                 c->arr[B_NEW].pressed = false;
                 return true;
             }
-            if (list->game->state == PREV)
+            else if (c->arr[SAVE].pressed)
+            {
+                gamelist_save(listp, g, m);
+                *mover = *listp;
+                c->arr[SAVE].pressed = false;
+                return true;
+            }
+            if (g->state == PREV)
             {
                 c->arr[LOAD].img.visible = true;
                 if (c->arr[LOAD].pressed)
                 {
                     c->arr[LOAD].pressed = false;
-                    Game *tempgame = (Game *)malloc(sizeof(Game));
-                    game_cpy(tempgame, list->game);
-                    gamelist_add(listp, tempgame);
-                    gamelist_tofirst(listp);
-                    list = *listp;
-                    list->game->list = list->game->history_board;
-                    game_list_fwdestroy(list->game->history_board->next);
-                    list->game->history_board->next = NULL;
-                    list->game->state = MATCH;
+                    g->list = g->history_board;
+                    game_list_fwdestroy(g->history_board->next);
+                    g->history_board->next = NULL;
+                    g->state = MATCH;
                 }
             }
             else
@@ -121,20 +124,23 @@ bool button_tasks(Controls *c, GameList **listp, GameList **mover, Master *m)
             c->arr[PREV_BW].img.visible = false;
             c->arr[B_NEW].img.visible = false;
         }
-        if (list->game->state == OPPONENT)
+        if (g->state == OPPONENT)
         {
             c->arr[PERSON].img.visible = true;
             c->arr[ROBOT].img.visible = true;
             if (c->arr[PERSON].pressed)
             {
-                list->game->opponent = HUMAN;
-                list->game->state = MATCH;
+                g->opponent = HUMAN;
+                g->state = MATCH;
+                game_add_position(g, m);
+                board_default(&g->list->board, m);
+                board_set_valid(&g->list->board, m);
                 c->arr[PERSON].pressed = false;
             }
             else if (c->arr[ROBOT].pressed)
             {
-                list->game->opponent = AI;
-                list->game->state = COLOR;
+                g->opponent = AI;
+                g->state = COLOR;
                 c->arr[ROBOT].pressed = false;
             }
             else
@@ -144,34 +150,38 @@ bool button_tasks(Controls *c, GameList **listp, GameList **mover, Master *m)
 
             return true;
         }
-        if (list->game->state == COLOR)
+        if (g->state == COLOR)
         {
             c->arr[B_BLACK].img.visible = true;
             c->arr[B_WHITE].img.visible = true;
             if (c->arr[B_BLACK].pressed)
             {
-                list->game->player_color = BLACK;
+                g->player_color = BLACK;
                 c->arr[B_BLACK].pressed = false;
             }
 
             else if (c->arr[B_WHITE].pressed)
             {
-                list->game->player_color = WHITE;
+                g->player_color = WHITE;
                 c->arr[B_WHITE].pressed = false;
             }
 
             else
                 return true;
-            list->game->state = MATCH;
+            g->state = MATCH;
+            board_default(&g->list->board, m);
+            board_set_valid(&g->list->board, m);
             c->arr[B_BLACK].img.visible = false;
             c->arr[B_WHITE].img.visible = false;
 
             return true;
         }
     }
-    if (m->state == HISTORY)
+    if (m->state == HISTORY && *mover != NULL)
     {
         c->arr[HISTORY_FW].img.visible = true;
+        c->arr[DELETE].img.visible = true;
+        c->arr[CONT].img.visible = true;
         c->arr[HISTORY_BW].img.visible = true;
         if (c->arr[HISTORY_FW].pressed && (*mover)->next != NULL)
         {
@@ -181,11 +191,25 @@ bool button_tasks(Controls *c, GameList **listp, GameList **mover, Master *m)
         {
             (*mover) = (*mover)->former;
         }
+        if (c->arr[CONT].pressed)
+        {
+            game_list_bwdestroy(g->list);
+            game_cpy(g, (*mover)->game);
+            c->arr[CONT].pressed = false;
+        }
+        if (c->arr[DELETE].pressed)
+        {
+            gamelist_remove(mover);
+            if(*mover == NULL) *listp = NULL;
+            c->arr[DELETE].pressed = false;
+        }
         c->arr[HISTORY_BW].pressed = false;
         c->arr[HISTORY_FW].pressed = false;
     }
     else
     {
+        c->arr[DELETE].img.visible = false;
+        c->arr[CONT].img.visible = false;
         c->arr[HISTORY_FW].img.visible = false;
         c->arr[HISTORY_BW].img.visible = false;
     }

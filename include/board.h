@@ -46,6 +46,9 @@ disk_color board_more(Board* b);
 Board board_init(int board_length, Master* m);
 
 //-
+void board_make(Board* b, Master *m);
+
+//-
 void board_put_disk(Board* b, pos p, Master* m);
 
 //-

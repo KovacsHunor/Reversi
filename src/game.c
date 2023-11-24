@@ -1,11 +1,10 @@
 #include "game.h"
 #include "stdio.h"
-void game_init(Game *g, disk_color player_c, Opponent opp, Master *m)
+void game_init(Game *g, Master *m)
 {
-    *g = (Game){.date = time(NULL), .state = OPPONENT, .list = NULL, .player_color = player_c, .opponent = opp};
+    *g = (Game){.state = OPPONENT, .list = NULL};
     game_add_position(g, m);
-    board_default(&g->list->board, m);
-    board_set_valid(&g->list->board, m);
+    board_make(&g->list->board, m);
 }
 
 void game_add_position(Game *g, Master *m)
@@ -99,7 +98,7 @@ void game_hbcpy(Game *dst, Game *src)
 
 void game_cpy(Game *dst, Game *src)
 {
-    *dst = (Game){.date = time(NULL), .state = src->state, .list = NULL, .player_color = src->player_color, .opponent = src->opponent};
+    *dst = (Game){.state = src->state, .list = NULL, .player_color = src->player_color, .opponent = src->opponent};
     game_listcpy(&dst->list, src->list);
     dst->history_board = dst->list;
     game_hbcpy(dst, src);

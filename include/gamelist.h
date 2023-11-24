@@ -13,8 +13,10 @@ void gamelist_add(GameList** list, Game* g);
 
 void gamelist_destroy(GameList* list);
 
-void gamelist_new(GameList** listp, Master* m);
+void gamelist_remove(GameList** list_item);
 
 void gamelist_tofirst(GameList** list);
+
+void gamelist_save(GameList **list, Game *g, Master *m);
 
 #endif

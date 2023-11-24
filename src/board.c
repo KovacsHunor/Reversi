@@ -7,6 +7,13 @@ Board board_init(int board_length, Master *m)
 
 void board_default(Board *b, Master *m)
 {
+    board_set_color(&b->disks[3][4], WHITE, m);
+    board_set_color(&b->disks[4][3], WHITE, m);
+    board_set_color(&b->disks[3][3], BLACK, m);
+    board_set_color(&b->disks[4][4], BLACK, m);
+}
+
+void board_make(Board* b, Master *m){
     for (int y = 0; y < b->tile_count; y++)
     {
         for (int x = 0; x < b->tile_count; x++)
@@ -14,10 +21,6 @@ void board_default(Board *b, Master *m)
             b->disks[y][x] = board_create_disk(b->position.x + x * (b->tile_size + 1), b->position.y + y * (b->tile_size + 1), NONE, m);
         }
     }
-    board_set_color(&b->disks[3][4], WHITE, m);
-    board_set_color(&b->disks[4][3], WHITE, m);
-    board_set_color(&b->disks[3][3], BLACK, m);
-    board_set_color(&b->disks[4][4], BLACK, m);
 }
 
 disk_color board_more(Board *b)

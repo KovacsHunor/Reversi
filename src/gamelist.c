@@ -96,6 +96,10 @@ void gamelist_load(GameList **list, Master* m){
             fscanf(fp, "%c%d", &input, &enumbuffer);
             (*list)->game->list->board.side = enumbuffer;
             fscanf(fp, "%c%d", &input, &(*list)->game->list->board.valid_count);
+
+            fscanf(fp, "%c%d", &input, &(*list)->game->list->board.points[0]);
+            fscanf(fp, "%c%d", &input, &(*list)->game->list->board.points[1]);
+
             for (int i = 0; i < (*list)->game->list->board.tile_count; i++)
             {
                 for (int j = 0; j < (*list)->game->list->board.tile_count; j++)
@@ -128,6 +132,8 @@ void gamelist_fprint(GameList **list)
             fprintf(fp, "__%d", btemp->board.state);
             fprintf(fp, "_%d", btemp->board.side);
             fprintf(fp, "_%d", btemp->board.valid_count);
+            fprintf(fp, "_%d", btemp->board.points[0]);
+            fprintf(fp, "_%d", btemp->board.points[1]);
             for (int i = 0; i < btemp->board.tile_count; i++)
             {
                 for (int j = 0; j < btemp->board.tile_count; j++)

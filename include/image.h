@@ -5,7 +5,7 @@
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include "master.h"
-//#include "debugmalloc.h"
+#include "debugmalloc.h"
 
 
 typedef struct Image{
@@ -16,9 +16,9 @@ typedef struct Image{
 
 bool img_hover(Image* img, int x, int y);
 
-Image img_init(int x, int y, char* path, Master* m, bool visible);
+Image img_init(int x, int y, char* path, SDL_Renderer* renderer, bool visible);
 
-void img_render(Image* img, Master* m);
+void img_render(Image* img, SDL_Renderer* renderer);
 
 void img_texture_swap(SDL_Texture** a, SDL_Texture** b);
 

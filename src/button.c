@@ -1,32 +1,26 @@
 #include "button.h"
 
-void button_ctrl_init(Controls *c, Master *m)
+void button_ctrl_init(Controls *c, SDL_Renderer* renderer)
 {
-    c->arr[MENU] = (Button){img_init(m->width - 200, 100, "../sprites/menu_B.png", m, true), IMG_LoadTexture(m->renderer, "../sprites/menu_A.png"), false};
-    c->arr[PLAY] = (Button){img_init(m->width - 200, 300, "../sprites/play_B.png", m, true), IMG_LoadTexture(m->renderer, "../sprites/play_A.png"), false};
-    c->arr[B_HISTORY] = (Button){img_init(m->width - 200, 500, "../sprites/history_B.png", m, true), IMG_LoadTexture(m->renderer, "../sprites/history_A.png"), false};
-    c->arr[PREV_BW] = (Button){img_init(m->width - 400, m->height - 300, "../sprites/arrow_L.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_L.png"), false};
-    c->arr[PREV_FW] = (Button){img_init(m->width - 200, m->height - 300, "../sprites/arrow_R.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_R.png"), false};
-    c->arr[PERSON] = (Button){img_init(800, 200, "../sprites/person.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/person.png"), false};
-    c->arr[ROBOT] = (Button){img_init(1000, 200, "../sprites/robot.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/robot.png"), false};
-    c->arr[B_BLACK] = (Button){img_init(800, 200, "../sprites/disk_B.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/disk_B.png"), false};
-    c->arr[B_WHITE] = (Button){img_init(1000, 200, "../sprites/disk_W.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/disk_W.png"), false};
-    c->arr[B_NEW] = (Button){img_init(200, m->height - 150, "../sprites/new.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/new.png"), false};
-    c->arr[HISTORY_FW] = (Button){img_init(600, m->height - 300, "../sprites/arrow_L.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_L.png"), false};
-    c->arr[HISTORY_BW] = (Button){img_init(m->width - 700, m->height - 300, "../sprites/arrow_R.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_R.png"), false};
-    c->arr[LOAD] = (Button){img_init(200, m->height - 500, "../sprites/load.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/load.png"), false};
-    c->arr[CONT] = (Button){img_init(800, m->height - 300, "../sprites/load.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/load.png"), false};
-    c->arr[DELETE] = (Button){img_init(1000, m->height - 300, "../sprites/delete.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/delete.png"), false};
-    c->arr[SAVE] = (Button){img_init(200, m->height - 320, "../sprites/save.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/save.png"), false};
-    c->arr[YES] = (Button){img_init(100, 200, "../sprites/yes.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/yes.png"), false};
-    c->arr[NO] = (Button){img_init(300, 200, "../sprites/delete.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/delete.png"), false};
+    c->arr[MENU] = (Button){img_init(WIDTH - 200, 100, "../sprites/menu_B.png",renderer, true), false};
+    c->arr[PLAY] = (Button){img_init(WIDTH - 200, 300, "../sprites/play_B.png",renderer, true), false};
+    c->arr[B_HISTORY] = (Button){img_init(WIDTH - 200, 500, "../sprites/history_B.png",renderer, true), false};
+    c->arr[PREV_BW] = (Button){img_init(WIDTH - 400,HEIGHT - 300, "../sprites/arrow_L.png",renderer, false), false};
+    c->arr[PREV_FW] = (Button){img_init(WIDTH - 200,HEIGHT - 300, "../sprites/arrow_R.png",renderer, false), false};
+    c->arr[PERSON] = (Button){img_init(800, 200, "../sprites/person.png",renderer, false), false};
+    c->arr[ROBOT] = (Button){img_init(1000, 200, "../sprites/robot.png",renderer, false), false};
+    c->arr[B_BLACK] = (Button){img_init(800, 200, "../sprites/disk_B.png",renderer, false), false};
+    c->arr[B_WHITE] = (Button){img_init(1000, 200, "../sprites/disk_W.png",renderer, false), false};
+    c->arr[B_NEW] = (Button){img_init(200,HEIGHT - 150, "../sprites/new.png",renderer, false), false};
+    c->arr[HISTORY_FW] = (Button){img_init(600,HEIGHT - 300, "../sprites/arrow_L.png",renderer, false), false};
+    c->arr[HISTORY_BW] = (Button){img_init(WIDTH - 700,HEIGHT - 300, "../sprites/arrow_R.png",renderer, false), false};
+    c->arr[LOAD] = (Button){img_init(200,HEIGHT - 500, "../sprites/load.png",renderer, false), false};
+    c->arr[CONT] = (Button){img_init(800,HEIGHT - 300, "../sprites/load.png",renderer, false), false};
+    c->arr[DELETE] = (Button){img_init(1000,HEIGHT - 300, "../sprites/delete.png",renderer, false), false};
+    c->arr[SAVE] = (Button){img_init(200,HEIGHT - 320, "../sprites/save.png",renderer, false), false};
+    c->arr[YES] = (Button){img_init(100, 200, "../sprites/yes.png",renderer, false), false};
+    c->arr[NO] = (Button){img_init(300, 200, "../sprites/delete.png",renderer, false), false};
     c->size = SIZE;
-}
-
-void button_press(Button *b, button_id id)
-{
-    img_texture_swap(&b[id].sw_sprite, &b[id].img.sprite);
-    b[id].pressed = true;
 }
 
 void button_ctrl_default(Button *b)
@@ -35,7 +29,6 @@ void button_ctrl_default(Button *b)
     {
         if (b[i].pressed)
         {
-            img_texture_swap(&b[i].sw_sprite, &b[i].img.sprite);
             b[i].pressed = false;
         }
         if (i != B_HISTORY && i != PLAY)
@@ -62,7 +55,7 @@ bool button_tasks(Controls *c, GameList **listp, Game *g, GameList **mover, Mast
 {
     if (m->ask)
     {
-        font_render(m, (pos){180, 100}, "biztos?");
+        font_render(m->renderer, (pos){180, 100}, "biztos?");
         c->arr[YES].img.visible = true;
         c->arr[NO].img.visible = true;
     }
@@ -106,7 +99,7 @@ bool button_tasks(Controls *c, GameList **listp, Game *g, GameList **mover, Mast
                 if (c->arr[YES].pressed)
                 {
                     game_list_bwdestroy(g->list);
-                    game_init(g, m);
+                    game_init(g);
                     c->arr[YES].pressed = false;
                 }
                 else if (c->arr[NO].pressed)
@@ -170,9 +163,9 @@ bool button_tasks(Controls *c, GameList **listp, Game *g, GameList **mover, Mast
             {
                 g->opponent = HUMAN;
                 g->state = MATCH;
-                game_add_position(g, m);
-                board_default(&g->list->board, m);
-                board_set_valid(&g->list->board, m);
+                game_add_position(g);
+                board_default(&g->list->board);
+                board_set_valid(&g->list->board);
                 c->arr[PERSON].pressed = false;
             }
             else if (c->arr[ROBOT].pressed)
@@ -207,8 +200,8 @@ bool button_tasks(Controls *c, GameList **listp, Game *g, GameList **mover, Mast
             else
                 return true;
             g->state = MATCH;
-            board_default(&g->list->board, m);
-            board_set_valid(&g->list->board, m);
+            board_default(&g->list->board);
+            board_set_valid(&g->list->board);
             c->arr[B_BLACK].img.visible = false;
             c->arr[B_WHITE].img.visible = false;
 
@@ -284,13 +277,11 @@ bool button_event(int x, int y, Button *b, Master *m)
 {
     if (img_hover(&b[MENU].img, x, y))
     {
-
         for (int i = 1; i < SIZE; i++)
         {
             if (i == PLAY || i == B_HISTORY)
                 b[i].img.visible = !b[i].img.visible;
         }
-        img_texture_swap(&b[MENU].sw_sprite, &b[MENU].img.sprite);
         b[MENU].pressed = !b[MENU].pressed;
     }
     if (!m->ask)
@@ -302,16 +293,12 @@ bool button_event(int x, int y, Button *b, Master *m)
                 if (i == PLAY || i == B_HISTORY)
                 {
                     button_ctrl_default(b);
-                    button_press(b, i);
                     if (i == PLAY)
                         m->state = GAME;
                     if (i == B_HISTORY)
                         m->state = HISTORY;
                 }
-                else
-                {
-                    b[i].pressed = true;
-                }
+                b[i].pressed = true;
             }
         }
     }
@@ -320,17 +307,17 @@ bool button_event(int x, int y, Button *b, Master *m)
         if (button_pressable(b, NO, x, y)) b[NO].pressed = true;
     }
 
-    button_render_all(b, m);
+    button_render_all(b, m->renderer);
     return true;
 }
 
-void button_render_all(Button *b, Master *m)
+void button_render_all(Button *b, SDL_Renderer* renderer)
 {
     for (int i = 0; i < SIZE; i++)
     {
         if (b[i].img.visible)
         {
-            img_render(&b[i].img, m);
+            img_render(&b[i].img, renderer);
         }
     }
 }

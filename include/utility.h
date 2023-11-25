@@ -2,7 +2,16 @@
 #define UTILITY_H
 #include <stdbool.h>
 #include <time.h>
-//#include "debugmalloc.h"
+#include "debugmalloc.h"
+
+#define WIDTH 1920
+#define HEIGHT 1080
+#define TILECOUNT 8
+#define TILESIZE 100
+#define BOARDLENGTH TILECOUNT*(TILESIZE+1)
+#define BOARDX 500
+#define BOARDY 100
+
 
 typedef struct pos{
     int x;

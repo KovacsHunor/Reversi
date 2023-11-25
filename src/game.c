@@ -1,13 +1,13 @@
 #include "game.h"
 #include "stdio.h"
-void game_init(Game *g, Master *m)
+void game_init(Game *g)
 {
     *g = (Game){.state = OPPONENT, .list = NULL};
-    game_add_position(g, m);
-    board_make(&g->list->board, m);
+    game_add_position(g);
+    board_make(&g->list->board);
 }
 
-void game_add_position(Game *g, Master *m)
+void game_add_position(Game *g)
 {
     BoardList *root = (BoardList *)malloc(sizeof(BoardList));
     if (g->list != NULL)
@@ -17,7 +17,7 @@ void game_add_position(Game *g, Master *m)
     }
     else
     {
-        root->board = board_init(800, m);
+        root->board = board_init(800);
     }
     root->former = g->list;
     root->next = NULL;
@@ -26,37 +26,37 @@ void game_add_position(Game *g, Master *m)
     g->history_board = g->list;
 }
 
-bool game_player_event(Game *g, int x, int y, Master *m)
+bool game_player_event(Game *g, int x, int y)
 {
-    if (!pos_hover((pos){g->list->board.position.x, g->list->board.position.y}, (pos){g->list->board.length, g->list->board.length}, (pos){x, y}))
+    if (!pos_hover((pos){BOARDX, BOARDY}, (pos){BOARDLENGTH, BOARDLENGTH}, (pos){x, y}))
     {
         return false;
     }
 
-    int i = (x - g->list->board.position.x) / (g->list->board.tile_size + 1);
-    int j = (y - g->list->board.position.y) / (g->list->board.tile_size + 1);
+    int i = (x - BOARDX) / (TILESIZE + 1);
+    int j = (y - BOARDY) / (TILESIZE + 1);
 
     // 0<i<8, 0<j<8
     if (g->list->board.disks[j][i] == VALID)
     {
-        game_add_position(g, m);
+        game_add_position(g);
 
         // g->list->board.state = BASIC;
         g->list->board.points[g->list->board.side]++;
 
-        board_put_disk(&g->list->board, (pos){i, j}, m);
+        board_put_disk(&g->list->board, (pos){i, j});
 
-        board_after_move(&g->list->board, m);
+        board_after_move(&g->list->board);
         return true;
     }
     return false;
 }
 
-void game_AI_event(Game *g, Master *m)
+void game_AI_event(Game *g)
 {
-    game_add_position(g, m);
-    minimax(&g->list->board, 0, INT32_MIN, INT32_MAX, m);
-    board_after_move(&g->list->board, m);
+    game_add_position(g);
+    minimax(&g->list->board, 0, INT32_MIN, INT32_MAX);
+    board_after_move(&g->list->board);
 }
 
 void game_listcpy(BoardList **dst, BoardList *src)

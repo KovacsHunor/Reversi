@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include <time.h>
+#include "debugmalloc.h"
 
 typedef struct BoardList{
     Board board;
@@ -21,21 +22,21 @@ typedef enum Game_state{
 typedef struct Game{
     time_t date;    //epoch
     BoardList* list;
-    disk_color player_color;
+    Disk player_color;
     Opponent opponent;
     BoardList* history_board;
     Game_state state;
 }Game;
 
-void game_init(Game* g, Master* m);
+void game_init(Game* g);
 
 //-
-bool game_player_event(Game* g, int x, int y, Master* m);
+bool game_player_event(Game* g, int x, int y);
 
 //-
-void game_AI_event(Game* g, Master* m);
+void game_AI_event(Game* g);
 
-void game_add_position(Game* g, Master* m);
+void game_add_position(Game* g);
 
 void game_listcpy(BoardList** dst, BoardList* src);
 

@@ -2,6 +2,7 @@
 #define GAMELIST_H
 
 #include "game.h"
+#include "debugmalloc.h"
 
 typedef struct GameList{
     Game* game;

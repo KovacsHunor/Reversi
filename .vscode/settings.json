@@ -9,6 +9,8 @@
         "string.h": "c",
         "sdl.h": "c",
         "stdlib.h": "c",
-        "board.h": "c"
+        "board.h": "c",
+        "debugmalloc.h": "c",
+        "utility.h": "c"
     }
 }

@@ -7,82 +7,67 @@
 #include "image.h"
 #include "utility.h"
 #include "font.h"
-//#include "debugmalloc.h"
-#define TILECOUNT 8
+#include "debugmalloc.h"
 
 typedef enum b_state{
     BASIC, PASS, END
 }b_state;
 
-typedef enum disk_color{
+typedef enum Disk{
     WHITE, BLACK, VALID, NONE
-}disk_color;
-
-typedef struct Disk{
-    disk_color color;
-    pos p;
 }Disk;
 
 typedef struct Board{
     int points[2];
-    int tile_size;
-    int tile_count;
-    int length;
 
     pos position;
     int valid_count;
 
-    disk_color side;
+    Disk side;
     pos msg;
 
     b_state state;
-    disk_color disks[8][8];
+    Disk disks[8][8];
 }Board;
 
 //-
-disk_color board_more(Board* b);
+Disk board_more(Board* b);
+
+int minimax(Board *b, int depth, int alpha, int beta);
 
 //-
-Board board_init(int board_length, Master* m);
+Board board_init();
+
+void board_put_disk(Board *b, pos p);
 
 //-
-void board_make(Board* b, Master *m);
+bool board_raycast(Board* b, pos p, bool flip);
 
 //-
-void board_put_disk(Board* b, pos p, Master* m);
+bool board_rec_valid(Board* b, pos p, pos v, bool first, bool flip);
 
 //-
-void board_after_move(Board* b, Master* m);
+void board_render_disk(Disk d, pos p, SDL_Renderer* renderer);
+
+void board_clear_valid(Board *b);
 
 //-
-bool board_raycast(Board* b, pos p, bool flip, Master* m);
+Disk board_flip_color(Disk c);
+
+void board_after_move(Board *b);
 
 //-
-bool board_rec_valid(Board* b, pos p, pos v, bool first, bool flip, Master* m);
+void board_set_valid(Board* b);
 
 //-
-void board_render_disk(disk_color d, pos p, Master *m);
+void board_print_event(Board *b, SDL_Renderer* renderer);
 
 //-
-disk_color board_flip_color(disk_color c);
+void board_default(Board* b);
+
+void board_make(Board *b);
 
 //-
-void board_set_valid(Board* b, Master* m);
-
-//-
-void board_print_event(Board *b, Master *m);
-
-//-
-void board_default(Board* b, Master* m);
-
-//-
-void board_clear(Board* b, Master* m, bool only_valid);
-
-//-
-int minimax(Board* b, int depth, int alpha, int beta, Master* m);
-
-
-//-
-void board_render(Master* m, Board* b);
+void board_render(SDL_Renderer* renderer, Board* b);
 
 #endif

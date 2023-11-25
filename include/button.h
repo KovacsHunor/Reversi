@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "image.h"
 #include "master.h"
-//#include "debugmalloc.h"
+#include "debugmalloc.h"
 #include "game.h"
 #include "gamelist.h"
 
@@ -35,7 +35,6 @@ typedef enum button_id
 typedef struct Button
 {
     Image img;
-    SDL_Texture *sw_sprite;
     bool pressed;
 } Button;
 
@@ -53,13 +52,11 @@ bool button_tasks(Controls *c, GameList **list, Game* g, GameList **mover, Maste
 
 void button_ctrl_default(Button *b);
 
-void button_press(Button *b, button_id id);
+void button_ctrl_init(Controls *c, SDL_Renderer* renderer);
 
-void button_ctrl_init(Controls *c, Master *m);
-
-bool button_event(int x, int y, Button *b, Master *m);
+bool button_event(int x, int y, Button *b, Master* m);
 
 //-
-void button_render_all(Button *b, Master *m);
+void button_render_all(Button *b, SDL_Renderer* renderer);
 
 #endif

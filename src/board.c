@@ -1,11 +1,11 @@
 #include "board.h"
 
-Board board_init(int board_length, Master *m)
+Board board_init()
 {
-    return (Board){.side = BLACK, .state = BASIC, .msg = (pos){200, 500}, .points = {2, 2}, .valid_count = 0, .length = board_length, .tile_count = TILECOUNT, .tile_size = board_length / TILECOUNT, .position = (pos){m->width / 2 - board_length / 2, m->height / 2 - board_length / 2}};
+    return (Board){.side = BLACK, .state = BASIC, .msg = (pos){200, 500}, .points = {2, 2}, .valid_count = 0};
 }
 
-void board_default(Board *b, Master *m)
+void board_default(Board *b)
 {
     b->disks[3][4] = WHITE;
     b->disks[4][3] = WHITE;
@@ -13,38 +13,20 @@ void board_default(Board *b, Master *m)
     b->disks[4][4] = BLACK;
 }
 
-void board_make(Board* b, Master *m){
-    for (int y = 0; y < b->tile_count; y++)
-    {
-        for (int x = 0; x < b->tile_count; x++)
-        {
+void board_make(Board* b){
+    for (int y = 0; y < TILECOUNT; y++)
+        for (int x = 0; x < TILECOUNT; x++)
             b->disks[y][x] = NONE;
-        }
-    }
 }
 
-disk_color board_more(Board *b)
+Disk board_more(Board *b)
 {
-    int black = 0;
-    int white = 0;
-    for (int i = 0; i < b->tile_count; i++)
-    {
-        for (int j = 0; j < b->tile_count; j++)
-        {
-            if (b->disks[i][j] == BLACK)
-                black++;
-            else if (b->disks[i][j] == WHITE)
-                white++;
-        }
-    }
-    if (black > white)
-        return BLACK;
-    if (white > black)
-        return WHITE;
+    if(b->points[WHITE] > b->points[BLACK]) return WHITE;
+    if(b->points[WHITE] < b->points[BLACK]) return BLACK;
     return NONE;
 }
 
-int minimax(Board *b, int depth, int alpha, int beta, Master *m)
+int minimax(Board *b, int depth, int alpha, int beta)
 {
     if (depth >= 6 || b->valid_count == 0)
     {
@@ -53,16 +35,16 @@ int minimax(Board *b, int depth, int alpha, int beta, Master *m)
     int best = b->side == BLACK ? INT32_MIN : INT32_MAX;
     pos bestpos;
 
-    for (int y = 0; y < b->tile_count; y++)
+    for (int y = 0; y < TILECOUNT; y++)
     {
-        for (int x = 0; x < b->tile_count; x++)
+        for (int x = 0; x < TILECOUNT; x++)
         {
             if (b->disks[y][x] == VALID)
             {
                 Board board = *b;
-                board_put_disk(&board, (pos){x, y}, m);
-                board_after_move(&board, m);
-                int value = minimax(&board, depth + 1, alpha, beta, m);
+                board_put_disk(&board, (pos){x, y});
+                board_after_move(&board);
+                int value = minimax(&board, depth + 1, alpha, beta);
 
                 if (b->side == BLACK)
                 {
@@ -92,41 +74,41 @@ int minimax(Board *b, int depth, int alpha, int beta, Master *m)
     if (depth == 0)
     {
         b->points[b->side]++;
-        board_put_disk(b, (pos){bestpos.x, bestpos.y}, m);
+        board_put_disk(b, (pos){bestpos.x, bestpos.y});
     }
     return best;
 }
 
-void board_print_event(Board *b, Master *m)
+void board_print_event(Board *b, SDL_Renderer* renderer)
 {
     if (b->state == END)
     {
-        disk_color winner = board_more(b);
+        Disk winner = board_more(b);
         if (winner == BLACK)
         {
-            font_render(m, b->msg, "BLACK win");
+            font_render(renderer, b->msg, "BLACK win");
         }
         else if (winner == WHITE)
         {
-            font_render(m, b->msg, "WHITE win");
+            font_render(renderer, b->msg, "WHITE win");
         }
         else
-            font_render(m, b->msg, "DRAW");
+            font_render(renderer, b->msg, "DRAW");
     }
     else if (b->state == PASS)
     {
         if (b->side == BLACK)
         {
-            font_render(m, b->msg, "WHITE: PASS");
+            font_render(renderer, b->msg, "WHITE: PASS");
         }
         else
         {
-            font_render(m, b->msg, "BLACK: PASS");
+            font_render(renderer, b->msg, "BLACK: PASS");
         }
     }
 }
 
-disk_color board_flip_color(disk_color c)
+Disk board_flip_color(Disk c)
 {
     if (c == WHITE)
         return BLACK;
@@ -135,16 +117,16 @@ disk_color board_flip_color(disk_color c)
     return c;
 }
 
-void board_after_move(Board *b, Master *m)
+void board_after_move(Board *b)
 {
     b->side = board_flip_color(b->side);
-    board_clear(b, m, true);
-    board_set_valid(b, m);
+    board_clear_valid(b);
+    board_set_valid(b);
 
     if (b->valid_count == 0)
     {
         b->side = board_flip_color(b->side);
-        board_set_valid(b, m);
+        board_set_valid(b);
         if (b->valid_count == 0){
             b->state = END;
         }
@@ -153,23 +135,23 @@ void board_after_move(Board *b, Master *m)
     else b->state = BASIC;
 }
 
-void board_put_disk(Board *b, pos p, Master *m)
+void board_put_disk(Board *b, pos p)
 {
-    board_clear(b, m, true);
+    board_clear_valid(b);
     b->disks[p.y][p.x] = b->side;
-    board_raycast(b, (pos){p.x, p.y}, true, m);
+    board_raycast(b, (pos){p.x, p.y}, true);
 }
 
-bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip, Master *m)
+bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip)
 {
-    if (p.x >= 0 && p.x < b->tile_count && p.y >= 0 && p.y < b->tile_count)
+    if (p.x >= 0 && p.x < TILECOUNT && p.y >= 0 && p.y < TILECOUNT)
     {
-        disk_color current = b->disks[p.y][p.x];
+        Disk current = b->disks[p.y][p.x];
         if (!first && current == b->side)
             return true;
         if (current == board_flip_color(b->side))
         {
-            bool found = board_rec_valid(b, pos_add(p, v), v, false, flip, m);
+            bool found = board_rec_valid(b, pos_add(p, v), v, false, flip);
             if (found && flip)
             {
                 b->disks[p.y][p.x] = b->side;
@@ -182,7 +164,7 @@ bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip, Master *m)
     return false;
 }
 
-bool board_raycast(Board *b, pos p, bool flip, Master *m)
+bool board_raycast(Board *b, pos p, bool flip)
 {
     bool valid = false;
     for (int i = -1; i <= 1; i++)
@@ -192,21 +174,21 @@ bool board_raycast(Board *b, pos p, bool flip, Master *m)
             if (i != 0 || j != 0)
             {
                 pos v = {i, j};
-                valid |= board_rec_valid(b, pos_add(p, v), v, true, flip, m);
+                valid |= board_rec_valid(b, pos_add(p, v), v, true, flip);
             }
         }
     }
     return valid;
 }
 
-void board_set_valid(Board *b, Master *m)
+void board_set_valid(Board *b)
 {
     b->valid_count = 0;
-    for (int y = 0; y < b->tile_count; y++)
+    for (int y = 0; y < TILECOUNT; y++)
     {
-        for (int x = 0; x < b->tile_count; x++)
+        for (int x = 0; x < TILECOUNT; x++)
         {
-            if (b->disks[y][x] == NONE && board_raycast(b, (pos){x, y}, false, m))
+            if (b->disks[y][x] == NONE && board_raycast(b, (pos){x, y}, false))
             {
                 b->disks[y][x] = VALID;
                 b->valid_count++;
@@ -215,57 +197,56 @@ void board_set_valid(Board *b, Master *m)
     }
 }
 
-void board_render_disk(disk_color d, pos p, Master *m)
+void board_render_disk(Disk d, pos p, SDL_Renderer* renderer)
 {
     Image img;
     if (d == WHITE)
-        img = img_init(p.x, p.y, "../sprites/disk_W.png", m, true);
+        img = img_init(p.x, p.y, "../sprites/disk_W.png", renderer, true);
     else if (d == BLACK)
-        img = img_init(p.x, p.y, "../sprites/disk_B.png", m, true);
+        img = img_init(p.x, p.y, "../sprites/disk_B.png", renderer, true);
     else if (d == VALID)
-        img = img_init(p.x, p.y, "../sprites/disk_V.png", m, true);
-    img_render(&img, m);
+        img = img_init(p.x, p.y, "../sprites/disk_V.png", renderer, true);
+    img_render(&img, renderer);
     SDL_DestroyTexture(img.sprite);
 }
 
-void board_clear(Board *b, Master *m, bool only_valid)
+void board_clear_valid(Board *b)
 {
-    for (int i = 0; i < b->tile_count; i++)
+    for (int i = 0; i < TILECOUNT; i++)
     {
-        for (int j = 0; j < b->tile_count; j++)
+        for (int j = 0; j < TILECOUNT; j++)
         {
-            if (only_valid && b->disks[i][j] != VALID)
-                continue;
-            b->disks[i][j] = NONE;
+            if (b->disks[i][j] == VALID)
+                b->disks[i][j] = NONE;
         }
     }
 }
 
-void board_render(Master *m, Board *b)
+void board_render(SDL_Renderer* renderer, Board *b)
 {
-    for (int i = 0; i < b->tile_count; i++)
+    for (int i = 0; i < TILECOUNT; i++)
     {
-        for (int j = 0; j < b->tile_count; j++)
+        for (int j = 0; j < TILECOUNT; j++)
         {
-            SDL_Rect r = {i * (b->tile_size + 1) + b->position.x, j * (b->tile_size + 1) + b->position.y, b->tile_size, b->tile_size};
-            SDL_SetRenderDrawColor(m->renderer, 0, (i + j) % 2 ? 120 : 130, 0, 255);
-            SDL_RenderFillRect(m->renderer, &r);
+            SDL_Rect r = {i * (TILESIZE + 1) + BOARDX, j * (TILESIZE + 1) + BOARDY, TILESIZE, TILESIZE};
+            SDL_SetRenderDrawColor(renderer, 0, (i + j) % 2 ? 120 : 130, 0, 255);
+            SDL_RenderFillRect(renderer, &r);
 
             if (b->disks[j][i] != NONE)
             {
-                board_render_disk(b->disks[j][i], (pos){b->position.x + i * (b->tile_size + 1), b->position.y + j * (b->tile_size + 1)}, m);
+                board_render_disk(b->disks[j][i], (pos){BOARDX + i * (TILESIZE + 1), BOARDY + j * (TILESIZE + 1)}, renderer);
             }
         }
     }
 
-    board_print_event(b, m);
+    board_print_event(b, renderer);
 
     char temp[50];
     sprintf(temp, "WHITE: %d", b->points[WHITE]);
-    font_render(m, (pos){b->position.x + b->length / 2, b->position.y - 100}, temp);
+    font_render(renderer, (pos){BOARDX + TILECOUNT*(TILESIZE+1) / 2, BOARDY - 100}, temp);
 
     sprintf(temp, "BLACK: %d", b->points[BLACK]);
-    font_render(m, (pos){b->position.x + b->length / 2, b->position.y + b->length + 50}, temp);
+    font_render(renderer, (pos){BOARDX + TILECOUNT*(TILESIZE+1) / 2, BOARDY + (TILESIZE+1)*TILECOUNT + 50}, temp);
 
-    SDL_SetRenderDrawColor(m->renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 }

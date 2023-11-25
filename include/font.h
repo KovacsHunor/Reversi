@@ -5,9 +5,8 @@
 #include <SDL_ttf.h>
 #include "master.h"
 #include "utility.h"
-//#include "debugmalloc.h"
+#include "debugmalloc.h"
 
-//-
-void font_render(Master *m, pos p, char* text);
+void font_render(SDL_Renderer *renderer, pos p, char *text);
 
 #endif

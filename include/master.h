@@ -4,7 +4,8 @@
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
 #include <stdbool.h>
-//#include "debugmalloc.h"
+#include "debugmalloc.h"
+#include "utility.h"
 
 typedef enum State{
     GAME, HISTORY

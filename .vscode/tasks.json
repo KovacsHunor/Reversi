@@ -17,6 +17,7 @@
                 "font.c",
                 "game.c",
                 "gamelist.c",
+                "event.c",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-I${workspaceFolder}/include",

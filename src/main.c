@@ -11,8 +11,7 @@
 #include "game.h"
 #include "button.h"
 #include "gamelist.h"
-
-#define BOARDSIZE 8
+#include "event.h"
 
 Uint32 timer(Uint32 ms, void *param)
 {
@@ -34,7 +33,6 @@ int main()
 
     GameList *list = NULL;
     gamelist_load(&list, &master);
-    GameList *mover = list;
 
     Game game;
     game_init(&game);
@@ -46,7 +44,6 @@ int main()
     SDL_RenderPresent(master.renderer);
 
     bool quit = false;
-    bool draw = false;
     while (!quit)
     {
         SDL_Event event;
@@ -57,43 +54,33 @@ int main()
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
 
-            draw |= button_tasks(&controls, &list, &game, &mover, &master);
+            event_main(&controls, &list, &game, &master);
             if (master.state == HISTORY)
             {
-                if (mover != NULL)
-                {
-                    font_render(master.renderer, (pos){700, 500}, ctime(&mover->game->date));
-                }
+                if (list != NULL)
+                    font_render(master.renderer, (pos){700, 500}, ctime(&list->game->date)); //probably allocates memory
                 else
-                {
                     font_render(master.renderer, (pos){700, 500}, "nincs mentett játszma");
-                }
             }
-            if (true) //(draw)
-            {
                 if (controls.arr[PLAY].pressed)
                     board_render(master.renderer, &game.history_board->board);
                 button_render_all(controls.arr, master.renderer);
-                draw = false;
                 SDL_RenderPresent(master.renderer);
-            }
 
             if (game.state == MATCH && game.list->board.side == board_flip_color(game.player_color) && game.opponent == AI && game.list->board.state != END && master.state == GAME)
             {
                 game_AI_event(&game);
-                draw = true;
             }
             break;
         case SDL_MOUSEBUTTONUP:
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                draw |= button_event(event.button.x, event.button.y, controls.arr, &master);
+                button_event(event.button.x, event.button.y, controls.arr, &master);
                 button_render_all(controls.arr, master.renderer);
                 if (!master.ask && game.state == MATCH && master.state == GAME && ((game.opponent == AI && game.list->board.side == game.player_color) || game.opponent == HUMAN))
                 {
-                    draw |= game_player_event(&game, event.button.x, event.button.y);
+                    game_player_event(&game, event.button.x, event.button.y);
                 }
-                draw = true;
             }
             break;
         case SDL_QUIT:
@@ -108,3 +95,4 @@ int main()
     SDL_Quit();
     return 0;
 }
+

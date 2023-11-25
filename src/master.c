@@ -1,7 +1,7 @@
 #include "master.h"
 
 Master master_init(int width, int height, Uint32 mode){
-    Master m = {.state = GAME, .width = width, .height = height, .mode = mode};
+    Master m = {.ask = false, .state = GAME, .width = width, .height = height, .mode = mode};
     master_set_SDL(&m);
     return m;
 }

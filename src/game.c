@@ -37,7 +37,7 @@ bool game_player_event(Game *g, int x, int y, Master *m)
     int j = (y - g->list->board.position.y) / (g->list->board.tile_size + 1);
 
     // 0<i<8, 0<j<8
-    if (g->list->board.disks[j][i].color == VALID)
+    if (g->list->board.disks[j][i] == VALID)
     {
         game_add_position(g, m);
 

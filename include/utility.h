@@ -2,7 +2,7 @@
 #define UTILITY_H
 #include <stdbool.h>
 #include <time.h>
-#include "debugmalloc.h"
+//#include "debugmalloc.h"
 
 typedef struct pos{
     int x;

@@ -1,5 +1,5 @@
 #include "font.h"
-#include "debugmalloc.h"
+//#include "debugmalloc.h"
 
 void font_render(Master *m, pos p, char* text){
     TTF_Init();

@@ -4,7 +4,7 @@
 #include <SDL_ttf.h>
 #include <SDL_image.h>
 
-#include "debugmalloc.h"
+//da#include "debugmalloc.h"
 #include "image.h"
 #include "master.h"
 #include "board.h"
@@ -88,7 +88,7 @@ int main()
             if (event.button.button == SDL_BUTTON_LEFT)
             {
                 draw |= button_event(event.button.x, event.button.y, controls.arr, &master);
-                if (game.state == MATCH && master.state == GAME && ((game.opponent == AI && game.list->board.side == game.player_color) || game.opponent == HUMAN))
+                if (!master.ask && game.state == MATCH && master.state == GAME && ((game.opponent == AI && game.list->board.side == game.player_color) || game.opponent == HUMAN))
                 {
                     draw |= game_player_event(&game, event.button.x, event.button.y, &master);
                 }

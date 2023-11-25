@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "image.h"
 #include "master.h"
-#include "debugmalloc.h"
+//#include "debugmalloc.h"
 #include "game.h"
 #include "gamelist.h"
 
@@ -27,6 +27,8 @@ typedef enum button_id
     CONT,
     DELETE,
     SAVE,
+    YES,
+    NO,
     SIZE
 } button_id;
 

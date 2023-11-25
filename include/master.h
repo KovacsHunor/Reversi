@@ -3,7 +3,8 @@
 
 #include <SDL2/SDL.h>
 #include <SDL_image.h>
-#include "debugmalloc.h"
+#include <stdbool.h>
+//#include "debugmalloc.h"
 
 typedef enum State{
     GAME, HISTORY
@@ -15,7 +16,7 @@ typedef struct Master{
     int width;
     int height;
     Uint32 mode;
-
+    bool ask;
     State state;
 }Master;
 

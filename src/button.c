@@ -11,13 +11,15 @@ void button_ctrl_init(Controls *c, Master *m)
     c->arr[ROBOT] = (Button){img_init(1000, 200, "../sprites/robot.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/robot.png"), false};
     c->arr[B_BLACK] = (Button){img_init(800, 200, "../sprites/disk_B.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/disk_B.png"), false};
     c->arr[B_WHITE] = (Button){img_init(1000, 200, "../sprites/disk_W.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/disk_W.png"), false};
-    c->arr[B_NEW] = (Button){img_init(200, 900, "../sprites/new.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/new.png"), false};
+    c->arr[B_NEW] = (Button){img_init(200, m->height - 150, "../sprites/new.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/new.png"), false};
     c->arr[HISTORY_FW] = (Button){img_init(600, m->height - 300, "../sprites/arrow_L.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_L.png"), false};
     c->arr[HISTORY_BW] = (Button){img_init(m->width - 700, m->height - 300, "../sprites/arrow_R.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/arrow_R.png"), false};
     c->arr[LOAD] = (Button){img_init(200, m->height - 500, "../sprites/load.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/load.png"), false};
     c->arr[CONT] = (Button){img_init(800, m->height - 300, "../sprites/load.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/load.png"), false};
     c->arr[DELETE] = (Button){img_init(1000, m->height - 300, "../sprites/delete.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/delete.png"), false};
-    c->arr[SAVE] = (Button){img_init(200, m->height - 700, "../sprites/save.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/save.png"), false};
+    c->arr[SAVE] = (Button){img_init(200, m->height - 320, "../sprites/save.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/save.png"), false};
+    c->arr[YES] = (Button){img_init(100, 200, "../sprites/yes.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/yes.png"), false};
+    c->arr[NO] = (Button){img_init(300, 200, "../sprites/delete.png", m, false), IMG_LoadTexture(m->renderer, "../sprites/delete.png"), false};
     c->size = SIZE;
 }
 
@@ -56,8 +58,19 @@ void ctrl_destroy(Controls c)
     }
 }
 
-bool button_tasks(Controls *c, GameList **listp, Game* g, GameList **mover, Master *m)
+bool button_tasks(Controls *c, GameList **listp, Game *g, GameList **mover, Master *m)
 {
+    if (m->ask)
+    {
+        font_render(m, (pos){180, 100}, "biztos?");
+        c->arr[YES].img.visible = true;
+        c->arr[NO].img.visible = true;
+    }
+    else
+    {
+        c->arr[YES].img.visible = false;
+        c->arr[NO].img.visible = false;
+    }
     if (m->state == GAME)
     {
         if (g->state == MATCH || g->state == PREV)
@@ -89,10 +102,22 @@ bool button_tasks(Controls *c, GameList **listp, Game* g, GameList **mover, Mast
             }
             else if (c->arr[B_NEW].pressed)
             {
-                game_list_bwdestroy(g->list);
-                game_init(g, m);
+                m->ask = true;
+                if (c->arr[YES].pressed)
+                {
+                    game_list_bwdestroy(g->list);
+                    game_init(g, m);
+                    c->arr[YES].pressed = false;
+                }
+                else if (c->arr[NO].pressed)
+                {
+                    c->arr[NO].pressed = false;
+                }
+                else
+                    return true;
+
                 c->arr[B_NEW].pressed = false;
-                return true;
+                m->ask = false;
             }
             else if (c->arr[SAVE].pressed)
             {
@@ -106,11 +131,23 @@ bool button_tasks(Controls *c, GameList **listp, Game* g, GameList **mover, Mast
                 c->arr[LOAD].img.visible = true;
                 if (c->arr[LOAD].pressed)
                 {
+                    m->ask = true;
+                    if (c->arr[YES].pressed)
+                    {
+                        g->list = g->history_board;
+                        game_list_fwdestroy(g->history_board->next);
+                        g->history_board->next = NULL;
+                        g->state = MATCH;
+                        c->arr[YES].pressed = false;
+                    }
+                    else if (c->arr[NO].pressed)
+                    {
+                        c->arr[NO].pressed = false;
+                    }
+                    else
+                        return true;
+                    m->ask = false;
                     c->arr[LOAD].pressed = false;
-                    g->list = g->history_board;
-                    game_list_fwdestroy(g->history_board->next);
-                    g->history_board->next = NULL;
-                    g->state = MATCH;
                 }
             }
             else
@@ -123,6 +160,7 @@ bool button_tasks(Controls *c, GameList **listp, Game* g, GameList **mover, Mast
             c->arr[PREV_FW].img.visible = false;
             c->arr[PREV_BW].img.visible = false;
             c->arr[B_NEW].img.visible = false;
+            c->arr[SAVE].img.visible = false;
         }
         if (g->state == OPPONENT)
         {
@@ -193,15 +231,40 @@ bool button_tasks(Controls *c, GameList **listp, Game* g, GameList **mover, Mast
         }
         if (c->arr[CONT].pressed)
         {
-            game_list_bwdestroy(g->list);
-            game_cpy(g, (*mover)->game);
+            m->ask = true;
+            if (c->arr[YES].pressed)
+            {
+                game_list_bwdestroy(g->list);
+                game_cpy(g, (*mover)->game);
+                c->arr[YES].pressed = false;
+            }
+            else if (c->arr[NO].pressed)
+            {
+                c->arr[NO].pressed = false;
+            }
+            else
+                return true;
+            m->ask = false;
+
             c->arr[CONT].pressed = false;
         }
         if (c->arr[DELETE].pressed)
         {
-            gamelist_remove(mover);
-            if(*mover == NULL) *listp = NULL;
-            gamelist_fprint(listp);
+            m->ask = true;
+            if (c->arr[YES].pressed)
+            {
+                gamelist_remove(mover);
+                if (*mover == NULL || (*mover)->next == NULL) *listp = *mover;
+                gamelist_fprint(listp);
+                c->arr[YES].pressed = false;
+            }
+            else if (c->arr[NO].pressed)
+            {
+                c->arr[NO].pressed = false;
+            }
+            else
+                return true;
+            m->ask = false;
             c->arr[DELETE].pressed = false;
         }
         c->arr[HISTORY_BW].pressed = false;
@@ -230,25 +293,33 @@ bool button_event(int x, int y, Button *b, Master *m)
         img_texture_swap(&b[MENU].sw_sprite, &b[MENU].img.sprite);
         b[MENU].pressed = !b[MENU].pressed;
     }
-    for (int i = 1; i < SIZE; i++)
+    if (!m->ask)
     {
-        if (button_pressable(b, i, x, y))
+        for (int i = 1; i < SIZE; i++)
         {
-            if (i == PLAY || i == B_HISTORY)
+            if (button_pressable(b, i, x, y))
             {
-                button_ctrl_default(b);
-                button_press(b, i);
-                if (i == PLAY)
-                    m->state = GAME;
-                if (i == B_HISTORY)
-                    m->state = HISTORY;
-            }
-            else
-            {
-                b[i].pressed = true;
+                if (i == PLAY || i == B_HISTORY)
+                {
+                    button_ctrl_default(b);
+                    button_press(b, i);
+                    if (i == PLAY)
+                        m->state = GAME;
+                    if (i == B_HISTORY)
+                        m->state = HISTORY;
+                }
+                else
+                {
+                    b[i].pressed = true;
+                }
             }
         }
     }
+    else{
+        if (button_pressable(b, YES, x, y)) b[YES].pressed = true;
+        if (button_pressable(b, NO, x, y)) b[NO].pressed = true;
+    }
+
     button_render_all(b, m);
     return true;
 }

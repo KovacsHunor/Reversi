@@ -22,17 +22,18 @@ void gamelist_destroy(GameList *list)
 
 void gamelist_remove(GameList **list_item)
 {
+    if(*list_item == NULL) return;
     GameList *temp = *list_item;
 
-    if ((*list_item)->former != NULL)
-        (*list_item)->former->next = (*list_item)->next;
-    if ((*list_item)->next != NULL)
-        (*list_item)->next->former = (*list_item)->former;
-
-    if ((*list_item)->former != NULL)
-        *list_item = (*list_item)->former;
-    else
-        *list_item = (*list_item)->next;
+    if (temp->next != NULL){
+        temp->next->former = temp->former;
+        *list_item = temp->next;
+    }
+    else{
+        *list_item = temp->former;
+    }
+    if (temp->former != NULL)
+        temp->former->next = temp->next;
     game_destroy(temp->game);
     free(temp);
 }
@@ -105,7 +106,7 @@ void gamelist_load(GameList **list, Master* m){
                 for (int j = 0; j < (*list)->game->list->board.tile_count; j++)
                 {
                     fscanf(fp, "%c%d", &input, &enumbuffer);
-                    (*list)->game->list->board.disks[i][j].color = enumbuffer;
+                    (*list)->game->list->board.disks[i][j] = enumbuffer;
                 }
             }
             fscanf(fp, "%c", &input);
@@ -138,7 +139,7 @@ void gamelist_fprint(GameList **list)
             {
                 for (int j = 0; j < btemp->board.tile_count; j++)
                 {
-                    fprintf(fp, "_%d", btemp->board.disks[i][j].color);
+                    fprintf(fp, "_%d", btemp->board.disks[i][j]);
                 }
             }
             btemp = btemp->former;

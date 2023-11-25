@@ -11,6 +11,8 @@
         "stdlib.h": "c",
         "board.h": "c",
         "debugmalloc.h": "c",
-        "utility.h": "c"
+        "utility.h": "c",
+        "event.h": "c",
+        "button.h": "c"
     }
 }

@@ -15,7 +15,7 @@
 
 Uint32 timer(Uint32 ms, void *param)
 {
-    SDL_Event ev;   
+    SDL_Event ev;
     ev.type = SDL_USEREVENT;
     SDL_PushEvent(&ev);
     return ms;
@@ -26,7 +26,7 @@ int main()
     Master master = master_init(WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE); // option: SDL_WINDOW_MAXIMIZED
     TTF_Init();
 
-    SDL_TimerID id = SDL_AddTimer(50, timer, NULL);
+    SDL_TimerID id = SDL_AddTimer(100, timer, NULL);
 
     SDL_SetRenderDrawColor(master.renderer, 0, 0, 0, 255);
     SDL_RenderClear(master.renderer);
@@ -42,7 +42,7 @@ int main()
     button_render_all(controls.arr, master.renderer);
 
     SDL_RenderPresent(master.renderer);
-
+    bool draw = false;
     bool quit = false;
     while (!quit)
     {
@@ -53,19 +53,20 @@ int main()
         {
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
-
             event_main(&controls, &list, &game, &master);
+
             if (master.state == HISTORY)
             {
                 if (list != NULL)
-                    font_render(master.renderer, (pos){700, 500}, ctime(&list->game->date)); //probably allocates memory
+                    font_render(master.renderer, (pos){700, 500}, ctime(&list->game->date)); // probably allocates memory
                 else
                     font_render(master.renderer, (pos){700, 500}, "nincs mentett játszma");
             }
-                if (controls.arr[PLAY].pressed)
-                    board_render(master.renderer, &game.history_board->board);
-                button_render_all(controls.arr, master.renderer);
-                SDL_RenderPresent(master.renderer);
+            if (controls.arr[PLAY].pressed)
+                board_render(master.renderer, &game.history_board->board);
+            button_render_all(controls.arr, master.renderer);
+
+            SDL_RenderPresent(master.renderer);
 
             if (game.state == MATCH && game.list->board.side == board_flip_color(game.player_color) && game.opponent == AI && game.list->board.state != END && master.state == GAME)
             {
@@ -95,4 +96,3 @@ int main()
     SDL_Quit();
     return 0;
 }
-

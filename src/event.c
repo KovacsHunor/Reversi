@@ -1,7 +1,11 @@
 #include "event.h"
 
-void event_pressed_confirm(Controls *c, bool* ask, Game *g, button_id id, GameList **list)
+static void event_pressed_confirm(Controls *c, bool *ask, Game *g, button_id id, GameList **list)
 {
+    if (*ask == false)
+    {
+        event_askflip(c, ask);
+    }
     *ask = true;
     if (c->arr[YES].pressed)
     {
@@ -31,16 +35,16 @@ void event_pressed_confirm(Controls *c, bool* ask, Game *g, button_id id, GameLi
     else
         return;
     c->arr[id].pressed = false;
-    *ask = false;
+    event_askflip(c, ask);
 }
 
-void event_new(Game *g)
+static void event_new(Game *g)
 {
     game_list_bwdestroy(g->list);
     game_init(g);
 }
 
-void event_load(Game *g)
+static void event_load(Game *g)
 {
     g->list = g->history_board;
     game_list_fwdestroy(g->history_board->next);
@@ -48,19 +52,19 @@ void event_load(Game *g)
     g->state = MATCH;
 }
 
-void event_cont(Game *g, GameList **list)
+static void event_cont(Game *g, GameList **list)
 {
     game_list_bwdestroy(g->list);
     game_cpy(g, (*list)->game);
 }
 
-void event_remove(GameList **list)
+static void event_remove(GameList **list)
 {
     gamelist_remove(list);
     gamelist_fprint(list);
 }
 
-void event_basic(Controls *c, GameList **list, Game *g, Master *m)
+static void event_basic(Controls *c, GameList **list, Game *g, Master *m)
 {
     c->arr[PREV_BW].img.visible = true;
     c->arr[SAVE].img.visible = true;
@@ -100,7 +104,7 @@ void event_basic(Controls *c, GameList **list, Game *g, Master *m)
         c->arr[LOAD].img.visible = false;
 }
 
-void event_opponent(Controls *c, GameList **list, Game *g)
+static void event_opponent(Controls *c, GameList **list, Game *g)
 {
     c->arr[PERSON].img.visible = true;
     c->arr[ROBOT].img.visible = true;
@@ -108,7 +112,6 @@ void event_opponent(Controls *c, GameList **list, Game *g)
     {
         g->opponent = HUMAN;
         g->state = MATCH;
-        game_add_position(g);
         board_default(&g->list->board);
         board_set_valid(&g->list->board);
         c->arr[PERSON].pressed = false;
@@ -125,7 +128,7 @@ void event_opponent(Controls *c, GameList **list, Game *g)
     c->arr[ROBOT].img.visible = false;
 }
 
-void event_color(Controls *c, GameList **list, Game *g)
+static void event_color(Controls *c, GameList **list, Game *g)
 {
     c->arr[B_BLACK].img.visible = true;
     c->arr[B_WHITE].img.visible = true;
@@ -134,7 +137,6 @@ void event_color(Controls *c, GameList **list, Game *g)
         g->player_color = BLACK;
         c->arr[B_BLACK].pressed = false;
     }
-
     else if (c->arr[B_WHITE].pressed)
     {
         g->player_color = WHITE;
@@ -150,7 +152,7 @@ void event_color(Controls *c, GameList **list, Game *g)
     c->arr[B_WHITE].img.visible = false;
 }
 
-void event_game(Controls *c, GameList **list, Game *g, Master *m)
+static void event_game(Controls *c, GameList **list, Game *g, Master *m)
 {
     if (g->state == MATCH || g->state == PREV)
         event_basic(c, list, g, m);
@@ -167,7 +169,7 @@ void event_game(Controls *c, GameList **list, Game *g, Master *m)
         event_color(c, list, g);
 }
 
-void event_history(Controls *c, GameList **list, Game *g, Master *m)
+static void event_history(Controls *c, GameList **list, Game *g, Master *m)
 {
     c->arr[HISTORY_FW].img.visible = true;
     c->arr[DELETE].img.visible = true;
@@ -191,19 +193,23 @@ void event_history(Controls *c, GameList **list, Game *g, Master *m)
         event_pressed_confirm(c, &m->ask, g, DELETE, list);
 }
 
+static void event_askflip(Controls *c, bool *ask)
+{
+    *ask = !*ask;
+    c->arr[YES].img.visible = !c->arr[YES].img.visible;
+    c->arr[NO].img.visible = !c->arr[NO].img.visible;
+}
+
+static void event_history_off(Controls *c)
+{
+    c->arr[DELETE].img.visible = false;
+    c->arr[CONT].img.visible = false;
+    c->arr[HISTORY_FW].img.visible = false;
+    c->arr[HISTORY_BW].img.visible = false;
+}
+
 void event_main(Controls *c, GameList **list, Game *g, Master *m)
 {
-    if (m->ask)
-    {
-        font_render(m->renderer, (pos){180, 100}, "biztos?");
-        c->arr[YES].img.visible = true;
-        c->arr[NO].img.visible = true;
-    }
-    else
-    {
-        c->arr[YES].img.visible = false;
-        c->arr[NO].img.visible = false;
-    }
     if (m->state == GAME)
     {
         event_game(c, list, g, m);
@@ -214,9 +220,11 @@ void event_main(Controls *c, GameList **list, Game *g, Master *m)
     }
     else
     {
-        c->arr[DELETE].img.visible = false;
-        c->arr[CONT].img.visible = false;
-        c->arr[HISTORY_FW].img.visible = false;
-        c->arr[HISTORY_BW].img.visible = false;
+        event_history_off(c);
+    }
+
+    if (m->ask)
+    {
+        font_render(m->renderer, (pos){180, 100}, "biztos?");
     }
 }

@@ -13,7 +13,7 @@ void game_add_position(Game *g, Master *m)
     if (g->list != NULL)
     {
         g->list->next = root;
-        root->board = g->list->board;
+        root->board = g->list->board; //why can I do that????????????????????
     }
     else
     {
@@ -84,6 +84,12 @@ void game_listcpy(BoardList **dst, BoardList *src)
     {
         *dst = NULL;
     }
+}
+
+void game_tofirst(BoardList **list)
+{
+    while ((*list)->next != NULL)
+        *list = (*list)->next;
 }
 
 void game_hbcpy(Game *dst, Game *src)

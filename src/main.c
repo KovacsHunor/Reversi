@@ -33,7 +33,7 @@ int main()
     SDL_RenderClear(master.renderer);
 
     GameList *list = NULL;
-
+    gamelist_load(&list, &master);
     GameList *mover = list;
 
     Game game;

@@ -19,6 +19,8 @@ void gamelist_tofirst(GameList** list);
 
 void gamelist_save(GameList **list, Game *g, Master *m);
 
+void gamelist_load(GameList **list, Master *m);
+
 void gamelist_fprint(GameList **list);
 
 #endif

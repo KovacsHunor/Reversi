@@ -253,6 +253,8 @@ Disk board_create_disk(int x, int y, disk_color c, Master *m)
     return d;
 }
 
+
+
 void board_render(Master *m, Board *b)
 {
     for (int i = 0; i < b->tile_count; i++)
@@ -265,7 +267,7 @@ void board_render(Master *m, Board *b)
 
             if (b->disks[j][i].color != NONE)
             {
-                board_render_disk(&b->disks[j][i], b->disks[j][i].p, m);
+                board_render_disk(&b->disks[j][i], (pos){b->position.x + i * (b->tile_size + 1), b->position.y + j * (b->tile_size + 1)}, m);
             }
         }
     }

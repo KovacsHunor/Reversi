@@ -201,6 +201,7 @@ bool button_tasks(Controls *c, GameList **listp, Game* g, GameList **mover, Mast
         {
             gamelist_remove(mover);
             if(*mover == NULL) *listp = NULL;
+            gamelist_fprint(listp);
             c->arr[DELETE].pressed = false;
         }
         c->arr[HISTORY_BW].pressed = false;

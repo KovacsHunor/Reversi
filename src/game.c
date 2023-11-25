@@ -4,16 +4,24 @@ void game_init(Game *g)
 {
     *g = (Game){.state = OPPONENT, .list = NULL};
     game_add_position(g);
-    board_make(&g->list->board);
+    board_clear(&g->list->board);
 }
 
-void game_add_position(Game *g)
+void game_cut(Game *g)
+{
+    g->list = g->history_board;
+    game_list_fwdestroy(g->history_board->next);
+    g->history_board->next = NULL;
+    g->state = MATCH;
+}
+
+static void game_add_position(Game *g)
 {
     BoardList *root = (BoardList *)malloc(sizeof(BoardList));
     if (g->list != NULL)
     {
         g->list->next = root;
-        root->board = g->list->board; //why can I do that????????????????????
+        root->board = g->list->board; // why can I do that????????????????????
     }
     else
     {
@@ -26,30 +34,23 @@ void game_add_position(Game *g)
     g->history_board = g->list;
 }
 
-bool game_player_event(Game *g, int x, int y)
+void game_player_event(Game *g, pos p)
 {
-    if (!pos_hover((pos){BOARDX, BOARDY}, (pos){BOARDLENGTH, BOARDLENGTH}, (pos){x, y}))
+    if (pos_hover((pos){BOARDX, BOARDY}, (pos){BOARDLENGTH, BOARDLENGTH}, p))
     {
-        return false;
+        int i = (p.x - BOARDX) / (TILESIZE + 1);
+        int j = (p.y - BOARDY) / (TILESIZE + 1);
+
+        if (g->list->board.disks[j][i] == VALID)
+        {
+            game_add_position(g);
+
+            g->list->board.points[g->list->board.side]++;
+
+            board_put_disk(&g->list->board, (pos){i, j});
+            board_after_move(&g->list->board);
+        }
     }
-
-    int i = (x - BOARDX) / (TILESIZE + 1);
-    int j = (y - BOARDY) / (TILESIZE + 1);
-
-    // 0<i<8, 0<j<8
-    if (g->list->board.disks[j][i] == VALID)
-    {
-        game_add_position(g);
-
-        // g->list->board.state = BASIC;
-        g->list->board.points[g->list->board.side]++;
-
-        board_put_disk(&g->list->board, (pos){i, j});
-
-        board_after_move(&g->list->board);
-        return true;
-    }
-    return false;
 }
 
 void game_AI_event(Game *g)
@@ -59,7 +60,7 @@ void game_AI_event(Game *g)
     board_after_move(&g->list->board);
 }
 
-void game_listcpy(BoardList **dst, BoardList *src)
+static void game_listcpy(BoardList **dst, BoardList *src)
 {
     if (src != NULL)
     {
@@ -70,7 +71,7 @@ void game_listcpy(BoardList **dst, BoardList *src)
 
         while (src != NULL)
         {
-            (*dst)->former = (BoardList*)malloc(sizeof(BoardList));
+            (*dst)->former = (BoardList *)malloc(sizeof(BoardList));
             (*dst)->former->board = src->board;
             (*dst)->former->next = *dst;
             *dst = (*dst)->former;
@@ -86,13 +87,13 @@ void game_listcpy(BoardList **dst, BoardList *src)
     }
 }
 
-void game_tofirst(BoardList **list)
+void game_tolast(BoardList **list)
 {
     while ((*list)->next != NULL)
         *list = (*list)->next;
 }
 
-void game_hbcpy(Game *dst, Game *src)
+static void game_hbcpy(Game *dst, Game *src)
 {
     BoardList *temp = src->list;
     while (src->history_board != temp)

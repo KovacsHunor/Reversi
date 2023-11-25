@@ -14,7 +14,7 @@
                 "board.c",
                 "button.c",
                 "utility.c",
-                "font.c",
+                "ffont.c",
                 "game.c",
                 "gamelist.c",
                 "event.c",

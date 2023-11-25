@@ -7,30 +7,34 @@
 #include "button.h"
 #include "gamelist.h"
 
-static void event_pressed_confirm(Controls *c, bool* ask, Game *g, button_id id, GameList **list);
+/// @brief adatvesztés lehetőségével járó gombnyomások megerősítésének kezelése
+/// @param controls gombok tömbje
+/// @param ask a megerősítőfelület állapota
+/// @param g az adott meccs
+/// @param id a gomb azonosítója
+/// @param list a meccsek listája
+static void event_pressed_confirm(Button *controls, bool* ask, Game *g, button_id id, GameList **list);
 
-static void event_new(Game *g);
+static void event_basic(Button *controls, GameList **list, Game *g, Master *m);
 
-static void event_load(Game *g);
+static void event_opponent(Button *controls, GameList **list, Game *g);
 
-static void event_cont(Game *g, GameList **list);
+static void event_color(Button *controls, GameList **list, Game *g);
 
-static void event_remove(GameList **list);
+static void event_game(Button *controls, GameList **list, Game *g, Master *m);
 
-static void event_basic(Controls *c, GameList **list, Game *g, Master *m);
+static void event_history(Button *controls, GameList **list, Game *g, bool* ask);
 
-static void event_opponent(Controls *c, GameList **list, Game *g);
+static void event_askflip(Button *controls, bool *ask);
 
-static void event_color(Controls *c, GameList **list, Game *g);
+static void event_history_off(Button *controls);
 
-static void event_game(Controls *c, GameList **list, Game *g, Master *m);
 
-static void event_history(Controls *c, GameList **list, Game *g, Master *m);
-
-static void event_askflip(Controls *c, bool *ask);
-
-static void event_history_off(Controls *c);
-
-void event_main(Controls *c, GameList **list, Game *g, Master *m);
+/// @brief a vezérőgombok állapota alapján állítja a program állapotát
+/// @param controls a gombok tömbje
+/// @param list a meccsek listája
+/// @param g a jelenlegi meccs
+/// @param m általános állapotokat tároló típus
+void event_main(Button *controls, GameList **list, Game *g, Master *m);
 
 #endif

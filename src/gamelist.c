@@ -20,28 +20,34 @@ void gamelist_destroy(GameList *list)
     free(list);
 }
 
-void gamelist_remove(GameList **list_item)
+void gamelist_remove(GameList **list)
 {
-    if(*list_item == NULL) return;
-    GameList *temp = *list_item;
+    if(*list == NULL) return;
+    GameList *temp = *list;
 
     if (temp->next != NULL){
         temp->next->former = temp->former;
-        *list_item = temp->next;
+        *list = temp->next;
     }
     else{
-        *list_item = temp->former;
+        *list = temp->former;
     }
     if (temp->former != NULL)
         temp->former->next = temp->next;
     game_destroy(temp->game);
     free(temp);
+    gamelist_fprint(list);
 }
 
 void gamelist_tofirst(GameList **list)
 {
     while (*list != NULL && (*list)->next != NULL)
         *list = (*list)->next;
+}
+
+void gamelist_load(Game *g, GameList **list){
+    game_list_bwdestroy(g->list);
+    game_cpy(g, (*list)->game);
 }
 
 void gamelist_save(GameList **list, Game *g, Master *m)
@@ -54,7 +60,7 @@ void gamelist_save(GameList **list, Game *g, Master *m)
     gamelist_fprint(list);
 }
 
-void gamelist_load(GameList **list, Master* m){
+void gamelist_fread(GameList **list, Master* m){
     FILE *fp = fopen("../save/save.txt", "r");
     char input;
     int enumbuffer;
@@ -111,7 +117,7 @@ void gamelist_load(GameList **list, Master* m){
             }
             fscanf(fp, "%c", &input);
         }
-        game_tofirst(&(*list)->game->list);
+        game_tolast(&(*list)->game->list);
         (*list)->game->history_board = (*list)->game->list;
     }
     gamelist_tofirst(list);

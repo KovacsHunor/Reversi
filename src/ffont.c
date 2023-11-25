@@ -1,12 +1,5 @@
-#include "font.h"
-//#include "debugmalloc.h"
+#include "ffont.h"
 
-
-
-/// @brief renderel egy szöveget
-/// @param renderer renderer 
-/// @param p a szöveg helye
-/// @param text a szöveg
 void font_render(SDL_Renderer* renderer, pos p, char* text){
     TTF_Init();
     TTF_Font *font = TTF_OpenFont("../fonts/LiberationSerif-Regular.ttf", 48);

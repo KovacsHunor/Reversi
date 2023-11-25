@@ -12,6 +12,7 @@
 #include "button.h"
 #include "gamelist.h"
 #include "event.h"
+#include "ffont.h"
 
 Uint32 timer(Uint32 ms, void *param)
 {
@@ -32,14 +33,14 @@ int main()
     SDL_RenderClear(master.renderer);
 
     GameList *list = NULL;
-    gamelist_load(&list, &master);
+    gamelist_fread(&list, &master);
 
     Game game;
     game_init(&game);
 
-    Controls controls;
-    button_ctrl_init(&controls, master.renderer);
-    button_render_all(controls.arr, master.renderer);
+    Button controls[SIZE];
+    button_ctrl_init(controls, master.renderer);
+    button_render_all(controls, master.renderer);
 
     SDL_RenderPresent(master.renderer);
     bool draw = false;
@@ -53,19 +54,16 @@ int main()
         {
         case SDL_USEREVENT:
             SDL_RenderClear(master.renderer);
-            event_main(&controls, &list, &game, &master);
+            event_main(controls, &list, &game, &master);
 
+            if (master.ask)
+                font_render(master.renderer, (pos){200, 100}, "biztos?");
             if (master.state == HISTORY)
-            {
-                if (list != NULL)
-                    font_render(master.renderer, (pos){700, 500}, ctime(&list->game->date)); // probably allocates memory
-                else
-                    font_render(master.renderer, (pos){700, 500}, "nincs mentett játszma");
-            }
-            if (controls.arr[PLAY].pressed)
-                board_render(master.renderer, &game.history_board->board);
-            button_render_all(controls.arr, master.renderer);
-
+                font_render(master.renderer, (pos){700, 500}, list != NULL?ctime(&list->game->date):"nincs mentett játszma");
+            if (controls[PLAY].pressed)
+                board_render(master.renderer, &game.history_board->board, game.player_color);
+            
+            button_render_all(controls, master.renderer);
             SDL_RenderPresent(master.renderer);
 
             if (game.state == MATCH && game.list->board.side == board_flip_color(game.player_color) && game.opponent == AI && game.list->board.state != END && master.state == GAME)
@@ -76,11 +74,11 @@ int main()
         case SDL_MOUSEBUTTONUP:
             if (event.button.button == SDL_BUTTON_LEFT)
             {
-                button_event(event.button.x, event.button.y, controls.arr, &master);
-                button_render_all(controls.arr, master.renderer);
+                button_event((pos){event.button.x, event.button.y}, controls, &master);
+                button_render_all(controls, master.renderer);
                 if (!master.ask && game.state == MATCH && master.state == GAME && ((game.opponent == AI && game.list->board.side == game.player_color) || game.opponent == HUMAN))
                 {
-                    game_player_event(&game, event.button.x, event.button.y);
+                    game_player_event(&game, (pos){event.button.x, event.button.y});
                 }
             }
             break;
@@ -91,8 +89,12 @@ int main()
     }
     gamelist_destroy(list);
     game_list_bwdestroy(game.list);
-    ctrl_destroy(controls);
+    button_ctrl_destroy(controls);
     SDL_RemoveTimer(id);
+    SDL_DestroyRenderer(master.renderer);
+    master.renderer = NULL;
+    SDL_DestroyWindow(master.window);
+    master.window = NULL;
     SDL_Quit();
     return 0;
 }

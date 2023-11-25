@@ -13,6 +13,7 @@
         "debugmalloc.h": "c",
         "utility.h": "c",
         "event.h": "c",
-        "button.h": "c"
+        "button.h": "c",
+        "font.h": "c"
     }
 }

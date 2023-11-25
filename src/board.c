@@ -2,7 +2,7 @@
 
 Board board_init()
 {
-    return (Board){.side = BLACK, .state = BASIC, .msg = (pos){200, 500}, .points = {2, 2}, .valid_count = 0};
+    return (Board){.side = BLACK, .state = BASIC, .msg = (pos){200, 500}, .points = {0, 0}, .valid_count = 0};
 }
 
 void board_default(Board *b)
@@ -11,9 +11,12 @@ void board_default(Board *b)
     b->disks[4][3] = WHITE;
     b->disks[3][3] = BLACK;
     b->disks[4][4] = BLACK;
+    b->points[0] = 2;
+    b->points[1] = 2;
 }
 
-void board_make(Board* b){
+void board_clear(Board *b)
+{
     for (int y = 0; y < TILECOUNT; y++)
         for (int x = 0; x < TILECOUNT; x++)
             b->disks[y][x] = NONE;
@@ -21,8 +24,10 @@ void board_make(Board* b){
 
 Disk board_more(Board *b)
 {
-    if(b->points[WHITE] > b->points[BLACK]) return WHITE;
-    if(b->points[WHITE] < b->points[BLACK]) return BLACK;
+    if (b->points[WHITE] > b->points[BLACK])
+        return WHITE;
+    if (b->points[WHITE] < b->points[BLACK])
+        return BLACK;
     return NONE;
 }
 
@@ -79,7 +84,7 @@ int minimax(Board *b, int depth, int alpha, int beta)
     return best;
 }
 
-void board_print_event(Board *b, SDL_Renderer* renderer)
+static void board_print_state(Board *b, SDL_Renderer *renderer)
 {
     if (b->state == END)
     {
@@ -108,13 +113,13 @@ void board_print_event(Board *b, SDL_Renderer* renderer)
     }
 }
 
-Disk board_flip_color(Disk c)
+Disk board_flip_color(Disk disk)
 {
-    if (c == WHITE)
+    if (disk == WHITE)
         return BLACK;
-    if (c == BLACK)
+    if (disk == BLACK)
         return WHITE;
-    return c;
+    return disk;
 }
 
 void board_after_move(Board *b)
@@ -127,12 +132,15 @@ void board_after_move(Board *b)
     {
         b->side = board_flip_color(b->side);
         board_set_valid(b);
-        if (b->valid_count == 0){
+        if (b->valid_count == 0)
+        {
             b->state = END;
         }
-        else b->state = PASS;
+        else
+            b->state = PASS;
     }
-    else b->state = BASIC;
+    else
+        b->state = BASIC;
 }
 
 void board_put_disk(Board *b, pos p)
@@ -142,7 +150,7 @@ void board_put_disk(Board *b, pos p)
     board_raycast(b, (pos){p.x, p.y}, true);
 }
 
-bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip)
+static bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip)
 {
     if (p.x >= 0 && p.x < TILECOUNT && p.y >= 0 && p.y < TILECOUNT)
     {
@@ -164,7 +172,7 @@ bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip)
     return false;
 }
 
-bool board_raycast(Board *b, pos p, bool flip)
+static bool board_raycast(Board *b, pos p, bool flip)
 {
     bool valid = false;
     for (int i = -1; i <= 1; i++)
@@ -197,7 +205,7 @@ void board_set_valid(Board *b)
     }
 }
 
-void board_render_disk(Disk d, pos p, SDL_Renderer* renderer)
+static void board_render_disk(Disk d, pos p, SDL_Renderer *renderer)
 {
     Image img;
     if (d == WHITE)
@@ -210,7 +218,7 @@ void board_render_disk(Disk d, pos p, SDL_Renderer* renderer)
     SDL_DestroyTexture(img.sprite);
 }
 
-void board_clear_valid(Board *b)
+static void board_clear_valid(Board *b)
 {
     for (int i = 0; i < TILECOUNT; i++)
     {
@@ -222,7 +230,7 @@ void board_clear_valid(Board *b)
     }
 }
 
-void board_render(SDL_Renderer* renderer, Board *b)
+void board_render(SDL_Renderer *renderer, Board *b, Disk player)
 {
     for (int i = 0; i < TILECOUNT; i++)
     {
@@ -239,14 +247,17 @@ void board_render(SDL_Renderer* renderer, Board *b)
         }
     }
 
-    board_print_event(b, renderer);
+    board_print_state(b, renderer);
 
-    char temp[50];
-    sprintf(temp, "WHITE: %d", b->points[WHITE]);
-    font_render(renderer, (pos){BOARDX + TILECOUNT*(TILESIZE+1) / 2, BOARDY - 100}, temp);
+    if (b->points[0]+b->points[1] != 0)
+    {
+        char temp[50];
+        sprintf(temp, "%s%d", player == WHITE ? "BLACK: " : "WHITE: ", b->points[board_flip_color(player)]);
+        font_render(renderer, (pos){BOARDX + TILECOUNT * (TILESIZE + 1) / 2, BOARDY - 100}, temp);
 
-    sprintf(temp, "BLACK: %d", b->points[BLACK]);
-    font_render(renderer, (pos){BOARDX + TILECOUNT*(TILESIZE+1) / 2, BOARDY + (TILESIZE+1)*TILECOUNT + 50}, temp);
+        sprintf(temp, "%s%d", player == WHITE ? "WHITE: " : "BLACK: ", b->points[player]);
+        font_render(renderer, (pos){BOARDX + TILECOUNT * (TILESIZE + 1) / 2, BOARDY + (TILESIZE + 1) * TILECOUNT + 50}, temp);
+    }
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 }

@@ -1,146 +1,121 @@
 #include "event.h"
 
-static void event_pressed_confirm(Controls *c, bool *ask, Game *g, button_id id, GameList **list)
+static void event_pressed_confirm(Button *controls, bool *ask, Game *g, button_id id, GameList **list)
 {
-    if (*ask == false)
+    if (!*ask)
     {
-        event_askflip(c, ask);
+        event_askflip(controls, ask);
     }
     *ask = true;
-    if (c->arr[YES].pressed)
+    if (controls[YES].pressed)
     {
         switch (id)
         {
         case B_NEW:
-            event_new(g);
+            game_list_bwdestroy(g->list);
+            game_init(g);
+            break;
+        case CUT:
+            game_cut(g);
             break;
         case LOAD:
-            event_load(g);
-            break;
-        case CONT:
-            event_cont(g, list);
+            gamelist_load(g, list);
             break;
         case DELETE:
-            event_remove(list);
+            gamelist_remove(list);
             break;
         default:
             break;
         }
-        c->arr[YES].pressed = false;
+        controls[YES].pressed = false;
     }
-    else if (c->arr[NO].pressed)
+    else if (controls[NO].pressed)
     {
-        c->arr[NO].pressed = false;
+        controls[NO].pressed = false;
     }
     else
         return;
-    c->arr[id].pressed = false;
-    event_askflip(c, ask);
+    controls[id].pressed = false;
+    event_askflip(controls, ask);
 }
 
-static void event_new(Game *g)
+static void event_basic(Button *controls, GameList **list, Game *g, Master *m)
 {
-    game_list_bwdestroy(g->list);
-    game_init(g);
-}
-
-static void event_load(Game *g)
-{
-    g->list = g->history_board;
-    game_list_fwdestroy(g->history_board->next);
-    g->history_board->next = NULL;
-    g->state = MATCH;
-}
-
-static void event_cont(Game *g, GameList **list)
-{
-    game_list_bwdestroy(g->list);
-    game_cpy(g, (*list)->game);
-}
-
-static void event_remove(GameList **list)
-{
-    gamelist_remove(list);
-    gamelist_fprint(list);
-}
-
-static void event_basic(Controls *c, GameList **list, Game *g, Master *m)
-{
-    c->arr[PREV_BW].img.visible = true;
-    c->arr[SAVE].img.visible = true;
-    c->arr[PREV_FW].img.visible = true;
-    c->arr[B_NEW].img.visible = true;
-    if (c->arr[PREV_BW].pressed)
+    controls[PREV_BW].img.visible = true;
+    controls[SAVE].img.visible = true;
+    controls[PREV_FW].img.visible = true;
+    controls[B_NEW].img.visible = true;
+    if (controls[PREV_BW].pressed)
     {
         if (g->history_board->former != NULL)
         {
             g->history_board = g->history_board->former;
             g->state = PREV;
         }
-        c->arr[PREV_BW].pressed = false;
+        controls[PREV_BW].pressed = false;
     }
-    else if (c->arr[PREV_FW].pressed)
+    else if (controls[PREV_FW].pressed)
     {
         if (g->history_board->next != NULL)
             g->history_board = g->history_board->next;
         if (g->history_board->next == NULL)
             g->state = MATCH;
-        c->arr[PREV_FW].pressed = false;
+        controls[PREV_FW].pressed = false;
     }
-    else if (c->arr[B_NEW].pressed)
-        event_pressed_confirm(c, &m->ask, g, B_NEW, list);
-    else if (c->arr[SAVE].pressed)
+    else if (controls[B_NEW].pressed)
+        event_pressed_confirm(controls, &m->ask, g, B_NEW, list);
+    else if (controls[SAVE].pressed)
     {
         gamelist_save(list, g, m);
-        c->arr[SAVE].pressed = false;
+        controls[SAVE].pressed = false;
     }
     if (g->state == PREV)
     {
-        c->arr[LOAD].img.visible = true;
-        if (c->arr[LOAD].pressed)
-            event_pressed_confirm(c, &m->ask, g, LOAD, list);
+        controls[CUT].img.visible = true;
+        if (controls[CUT].pressed)
+            event_pressed_confirm(controls, &m->ask, g, CUT, list);
     }
     else
-        c->arr[LOAD].img.visible = false;
+        controls[CUT].img.visible = false;
 }
 
-static void event_opponent(Controls *c, GameList **list, Game *g)
+static void event_opponent(Button *controls, GameList **list, Game *g)
 {
-    c->arr[PERSON].img.visible = true;
-    c->arr[ROBOT].img.visible = true;
-    if (c->arr[PERSON].pressed)
+    controls[PERSON].img.visible = true;
+    controls[ROBOT].img.visible = true;
+    if (controls[PERSON].pressed)
     {
         g->opponent = HUMAN;
         g->state = MATCH;
         board_default(&g->list->board);
         board_set_valid(&g->list->board);
-        c->arr[PERSON].pressed = false;
+        controls[PERSON].pressed = false;
     }
-    else if (c->arr[ROBOT].pressed)
+    else if (controls[ROBOT].pressed)
     {
         g->opponent = AI;
         g->state = COLOR;
-        c->arr[ROBOT].pressed = false;
+        controls[ROBOT].pressed = false;
     }
     else
         return;
-    c->arr[PERSON].img.visible = false;
-    c->arr[ROBOT].img.visible = false;
+    controls[PERSON].img.visible = false;
+    controls[ROBOT].img.visible = false;
 }
 
-static void event_color(Controls *c, GameList **list, Game *g)
+static void event_color(Button *controls, GameList **list, Game *g)
 {
-    c->arr[B_BLACK].img.visible = true;
-    c->arr[B_WHITE].img.visible = true;
-    if (c->arr[B_BLACK].pressed)
+    controls[B_BLACK].img.visible = true;
+    controls[B_WHITE].img.visible = true;
+    if (controls[B_BLACK].pressed)
     {
         g->player_color = BLACK;
-        c->arr[B_BLACK].pressed = false;
+        controls[B_BLACK].pressed = false;
     }
-    else if (c->arr[B_WHITE].pressed)
+    else if (controls[B_WHITE].pressed)
     {
         g->player_color = WHITE;
-        c->arr[B_WHITE].pressed = false;
+        controls[B_WHITE].pressed = false;
     }
 
     else
@@ -148,83 +123,78 @@ static void event_color(Controls *c, GameList **list, Game *g)
     g->state = MATCH;
     board_default(&g->list->board);
     board_set_valid(&g->list->board);
-    c->arr[B_BLACK].img.visible = false;
-    c->arr[B_WHITE].img.visible = false;
+    controls[B_BLACK].img.visible = false;
+    controls[B_WHITE].img.visible = false;
 }
 
-static void event_game(Controls *c, GameList **list, Game *g, Master *m)
+static void event_game(Button *controls, GameList **list, Game *g, Master *m)
 {
     if (g->state == MATCH || g->state == PREV)
-        event_basic(c, list, g, m);
+        event_basic(controls, list, g, m);
     else
     {
-        c->arr[PREV_FW].img.visible = false;
-        c->arr[PREV_BW].img.visible = false;
-        c->arr[B_NEW].img.visible = false;
-        c->arr[SAVE].img.visible = false;
+        controls[PREV_FW].img.visible = false;
+        controls[PREV_BW].img.visible = false;
+        controls[B_NEW].img.visible = false;
+        controls[SAVE].img.visible = false;
     }
     if (g->state == OPPONENT)
-        event_opponent(c, list, g);
+        event_opponent(controls, list, g);
     if (g->state == COLOR)
-        event_color(c, list, g);
+        event_color(controls, list, g);
 }
 
-static void event_history(Controls *c, GameList **list, Game *g, Master *m)
+static void event_history(Button *controls, GameList **list, Game *g, bool *ask)
 {
-    c->arr[HISTORY_FW].img.visible = true;
-    c->arr[DELETE].img.visible = true;
-    c->arr[CONT].img.visible = true;
-    c->arr[HISTORY_BW].img.visible = true;
-    if (c->arr[HISTORY_FW].pressed)
+    controls[HISTORY_FW].img.visible = true;
+    controls[DELETE].img.visible = true;
+    controls[LOAD].img.visible = true;
+    controls[HISTORY_BW].img.visible = true;
+    if (controls[HISTORY_FW].pressed)
     {
-        c->arr[HISTORY_FW].pressed = false;
+        controls[HISTORY_FW].pressed = false;
         if ((*list)->next != NULL)
             (*list) = (*list)->next;
     }
-    else if (c->arr[HISTORY_BW].pressed)
+    else if (controls[HISTORY_BW].pressed)
     {
-        c->arr[HISTORY_BW].pressed = false;
+        controls[HISTORY_BW].pressed = false;
         if ((*list)->former != NULL)
             (*list) = (*list)->former;
     }
-    else if (c->arr[CONT].pressed)
-        event_pressed_confirm(c, &m->ask, g, CONT, list);
-    else if (c->arr[DELETE].pressed)
-        event_pressed_confirm(c, &m->ask, g, DELETE, list);
+    else if (controls[LOAD].pressed)
+        event_pressed_confirm(controls, ask, g, LOAD, list);
+    else if (controls[DELETE].pressed)
+        event_pressed_confirm(controls, ask, g, DELETE, list);
 }
 
-static void event_askflip(Controls *c, bool *ask)
+static void event_askflip(Button *controls, bool *ask)
 {
     *ask = !*ask;
-    c->arr[YES].img.visible = !c->arr[YES].img.visible;
-    c->arr[NO].img.visible = !c->arr[NO].img.visible;
+    controls[YES].img.visible = !controls[YES].img.visible;
+    controls[NO].img.visible = !controls[NO].img.visible;
 }
 
-static void event_history_off(Controls *c)
+static void event_history_off(Button *controls)
 {
-    c->arr[DELETE].img.visible = false;
-    c->arr[CONT].img.visible = false;
-    c->arr[HISTORY_FW].img.visible = false;
-    c->arr[HISTORY_BW].img.visible = false;
+    controls[DELETE].img.visible = false;
+    controls[LOAD].img.visible = false;
+    controls[HISTORY_FW].img.visible = false;
+    controls[HISTORY_BW].img.visible = false;
 }
 
-void event_main(Controls *c, GameList **list, Game *g, Master *m)
+void event_main(Button *controls, GameList **list, Game *g, Master *m)
 {
     if (m->state == GAME)
     {
-        event_game(c, list, g, m);
+        event_game(controls, list, g, m);
     }
     if (m->state == HISTORY && *list != NULL)
     {
-        event_history(c, list, g, m);
+        event_history(controls, list, g, &m->ask);
     }
     else
     {
-        event_history_off(c);
-    }
-
-    if (m->ask)
-    {
-        font_render(m->renderer, (pos){180, 100}, "biztos?");
+        event_history_off(controls);
     }
 }

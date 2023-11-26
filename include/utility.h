@@ -11,7 +11,7 @@
 #define BOARDLENGTH TILECOUNT*(TILESIZE+1)
 #define BOARDX 500
 #define BOARDY 100
-#define MSGX 200
+#define MSGX 150
 #define MSGY 500
 
 

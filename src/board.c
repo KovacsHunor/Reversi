@@ -254,10 +254,10 @@ void board_render(SDL_Renderer *renderer, Board *b, Disk player)
     {
         char temp[50];
         sprintf(temp, "%s%d", player == WHITE ? "BLACK: " : "WHITE: ", b->points[board_flip_color(player)]);
-        font_render(renderer, (pos){BOARDX + TILECOUNT * (TILESIZE + 1) / 2, BOARDY - 100}, temp);
+        font_render(renderer, (pos){BOARDX + TILECOUNT * (TILESIZE + 1) / 2 - 80, BOARDY - 70}, temp);
 
         sprintf(temp, "%s%d", player == WHITE ? "WHITE: " : "BLACK: ", b->points[player]);
-        font_render(renderer, (pos){BOARDX + TILECOUNT * (TILESIZE + 1) / 2, BOARDY + (TILESIZE + 1) * TILECOUNT + 50}, temp);
+        font_render(renderer, (pos){BOARDX + TILECOUNT * (TILESIZE + 1) / 2 - 80, BOARDY + (TILESIZE + 1) * TILECOUNT + 50}, temp);
     }
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

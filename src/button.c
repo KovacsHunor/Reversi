@@ -42,11 +42,11 @@ bool button_pressable(Button *b, Button_id id, pos p)
     return b[id].img.visible && !b[id].pressed && img_hover(&b[id].img, p);
 }
 
-void button_ctrl_destroy(Button* b)
+void button_ctrl_destroy(Button* controls)
 {
     for (int i = 0; i < SIZE; i++)
     {
-        SDL_DestroyTexture(b[i].img.sprite);
+        SDL_DestroyTexture(controls[i].img.sprite);
     }
 }
 

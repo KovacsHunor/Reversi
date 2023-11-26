@@ -19,6 +19,7 @@
                 "gamelist.c",
                 "event.c",
                 "-Wall",
+                "-Werror",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
                 "-I${workspaceFolder}/include",

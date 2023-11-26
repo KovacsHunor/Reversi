@@ -10,7 +10,8 @@
 
 /// @brief kép típus
 typedef struct Image{
-    pos p, size;
+    pos p;
+    pos size;
     SDL_Texture *sprite;
     bool visible;
 }Image;

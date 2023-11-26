@@ -11,8 +11,8 @@
 #define BOARDLENGTH TILECOUNT*(TILESIZE+1)
 #define BOARDX 500
 #define BOARDY 100
-#define MSGX 500
-#define MSGY 100
+#define MSGX 200
+#define MSGY 500
 
 
 /// @brief pozíció tárolására alkalmas típus

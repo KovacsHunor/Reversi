@@ -7,7 +7,8 @@ bool img_hover(Image* img, pos p){
 Image img_init(pos p, char* path, SDL_Renderer* renderer, bool visible){
     Image img = (Image){p, (pos){0, 0}, IMG_LoadTexture(renderer, path), visible};
     if(img.sprite == NULL){
-        printf("img loading error");
+        SDL_Log("Nem nyithato meg a kepfajl: %s", IMG_GetError());
+        exit(1);
     }
     SDL_QueryTexture(img.sprite, NULL, NULL, &(img.size.x), &(img.size.y));
     return img;

@@ -41,8 +41,8 @@ typedef struct Button
 } Button;
 
 /// @brief felszabadítja a kapott gomb-tömb elemeit
-/// @param b gombok tömbje
-void button_ctrl_destroy(Button* b);
+/// @param controls gombok tömbje
+void button_ctrl_destroy(Button* controls);
 
 /// @brief megnézi, hogy megnyomható-e az adott gomb
 /// @param b a gombok tömbje

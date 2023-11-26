@@ -17,10 +17,15 @@ void game_cut(Game *g)
 void game_add_position(Game *g)
 {
     BoardList *root = (BoardList *)malloc(sizeof(BoardList));
+    if (root == NULL)
+    {
+        perror("Nem sikerült memóriát foglalni!");
+        exit(1);
+    }
     if (g->list != NULL)
     {
         g->list->next = root;
-        root->board = g->list->board; // why can I do that????????????????????
+        root->board = g->list->board; //
     }
     else
     {
@@ -62,6 +67,11 @@ void game_listcpy(BoardList **dst, BoardList *src)
     if (src != NULL)
     {
         *dst = (BoardList *)malloc(sizeof(BoardList));
+        if (dst == NULL)
+        {
+            perror("Nem sikerült memóriát foglalni!");
+            exit(1);
+        }
         (*dst)->board = src->board;
         (*dst)->next = NULL;
         src = src->former;
@@ -69,6 +79,11 @@ void game_listcpy(BoardList **dst, BoardList *src)
         while (src != NULL)
         {
             (*dst)->former = (BoardList *)malloc(sizeof(BoardList));
+            if ((*dst)->former == NULL)
+            {
+                perror("Nem sikerült memóriát foglalni!");
+                exit(1);
+            }
             (*dst)->former->board = src->board;
             (*dst)->former->next = *dst;
             *dst = (*dst)->former;

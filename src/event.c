@@ -40,7 +40,7 @@ void event_pressed_confirm(Button *controls, bool *ask, Game *g, Button_id id, G
     event_askflip(controls, ask);
 }
 
-void event_basic(Button *controls, GameList **list, Game *g, Master *m)
+void event_basic(Button *controls, GameList **list, Game *g, bool *ask)
 {
     controls[PREV_BW].img.visible = true;
     controls[SAVE].img.visible = true;
@@ -64,7 +64,7 @@ void event_basic(Button *controls, GameList **list, Game *g, Master *m)
         controls[PREV_FW].pressed = false;
     }
     else if (controls[B_NEW].pressed)
-        event_pressed_confirm(controls, &m->ask, g, B_NEW, list);
+        event_pressed_confirm(controls, ask, g, B_NEW, list);
     else if (controls[SAVE].pressed)
     {
         gamelist_save(list, g);
@@ -74,7 +74,7 @@ void event_basic(Button *controls, GameList **list, Game *g, Master *m)
     {
         controls[CUT].img.visible = true;
         if (controls[CUT].pressed)
-            event_pressed_confirm(controls, &m->ask, g, CUT, list);
+            event_pressed_confirm(controls, ask, g, CUT, list);
     }
     else
         controls[CUT].img.visible = false;
@@ -128,10 +128,10 @@ void event_color(Button *controls, GameList **list, Game *g)
     controls[B_WHITE].img.visible = false;
 }
 
-void event_game(Button *controls, GameList **list, Game *g, Master *m)
+void event_game(Button *controls, GameList **list, Game *g, bool *ask)
 {
     if (g->state == MATCH || g->state == PREV)
-        event_basic(controls, list, g, m);
+        event_basic(controls, list, g, ask);
     else
     {
         controls[PREV_FW].img.visible = false;
@@ -176,19 +176,11 @@ void event_askflip(Button *controls, bool *ask)
     controls[NO].img.visible = !controls[NO].img.visible;
 }
 
-void event_history_off(Button *controls)
-{
-    controls[DELETE].img.visible = false;
-    controls[LOAD].img.visible = false;
-    controls[HISTORY_FW].img.visible = false;
-    controls[HISTORY_BW].img.visible = false;
-}
-
 void event_main(Button *controls, GameList **list, Game *g, Master *m)
 {
     if (m->state == GAME)
     {
-        event_game(controls, list, g, m);
+        event_game(controls, list, g, &m->ask);
     }
     if (m->state == HISTORY && *list != NULL)
     {
@@ -196,6 +188,9 @@ void event_main(Button *controls, GameList **list, Game *g, Master *m)
     }
     else
     {
-        event_history_off(controls);
+        controls[DELETE].img.visible = false;
+        controls[LOAD].img.visible = false;
+        controls[HISTORY_FW].img.visible = false;
+        controls[HISTORY_BW].img.visible = false;
     }
 }

@@ -15,19 +15,17 @@
 /// @param list a meccsek listája
 void event_pressed_confirm(Button *controls, bool* ask, Game *g, Button_id id, GameList **list);
 
-void event_basic(Button *controls, GameList **list, Game *g, Master *m);
+void event_basic(Button *controls, GameList **list, Game *g, bool* ask);
 
 void event_opponent(Button *controls, GameList **list, Game *g);
 
 void event_color(Button *controls, GameList **list, Game *g);
 
-void event_game(Button *controls, GameList **list, Game *g, Master *m);
+void event_game(Button *controls, GameList **list, Game *g, bool* ask);
 
 void event_history(Button *controls, GameList **list, Game *g, bool* ask);
 
 void event_askflip(Button *controls, bool *ask);
-
-void event_history_off(Button *controls);
 
 
 /// @brief a vezérőgombok állapota alapján állítja a program állapotát

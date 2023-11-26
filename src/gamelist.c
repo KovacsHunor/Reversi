@@ -46,6 +46,7 @@ void gamelist_tolast(GameList **list)
 }
 
 void gamelist_load(Game *g, GameList **list){
+    game_tolast(&g->list);
     game_list_bwdestroy(g->list);
     game_cpy(g, (*list)->game);
 }

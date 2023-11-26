@@ -12,6 +12,7 @@ static void event_pressed_confirm(Button *controls, bool *ask, Game *g, button_i
         switch (id)
         {
         case B_NEW:
+            game_tolast(&g->list);
             game_list_bwdestroy(g->list);
             game_init(g);
             break;

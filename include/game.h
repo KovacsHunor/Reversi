@@ -29,7 +29,6 @@ typedef struct Game{
     BoardList* list;
     Disk player_color;
     Opponent opponent;
-    BoardList* history_board;
     Game_state state;
 }Game;
 
@@ -63,11 +62,6 @@ static void game_listcpy(BoardList** dst, BoardList* src);
 /// @brief az utolsó állásba lépteti a listát
 /// @param list a lista
 void game_tolast(BoardList **list);
-
-/// @brief beállítja a history_board-ot az cél meccsen a forrás mintájára
-/// @param dst cél meccs
-/// @param src forrás meccs
-static void game_hbcpy(Game* dst, Game* src);
 
 /// @brief átmásolja a forrás meccs adatait a cél meccs-be
 /// @param dst cél meccs

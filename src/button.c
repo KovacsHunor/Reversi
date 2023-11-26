@@ -2,24 +2,24 @@
 
 void button_ctrl_init(Button *arr, SDL_Renderer* renderer)
 {
-    arr[MENU] = (Button){img_init(WIDTH - 200, 100, "../sprites/menu_B.png",renderer, true), false};
-    arr[PLAY] = (Button){img_init(WIDTH - 200, 300, "../sprites/play_B.png",renderer, true), false};
-    arr[B_HISTORY] = (Button){img_init(WIDTH - 200, 500, "../sprites/history_B.png",renderer, true), false};
-    arr[PREV_BW] = (Button){img_init(WIDTH - 400,HEIGHT - 300, "../sprites/arrow_L.png",renderer, false), false};
-    arr[PREV_FW] = (Button){img_init(WIDTH - 200,HEIGHT - 300, "../sprites/arrow_R.png",renderer, false), false};
-    arr[PERSON] = (Button){img_init(840, 330, "../sprites/person.png",renderer, false), false};
-    arr[ROBOT] = (Button){img_init(840, 530, "../sprites/robot.png",renderer, false), false};
-    arr[B_BLACK] = (Button){img_init(850, 350, "../sprites/disk_B.png",renderer, false), false};
-    arr[B_WHITE] = (Button){img_init(850, 550, "../sprites/disk_W.png",renderer, false), false};
-    arr[B_NEW] = (Button){img_init(200,HEIGHT - 150, "../sprites/new.png",renderer, false), false};
-    arr[HISTORY_FW] = (Button){img_init(600,HEIGHT - 300, "../sprites/arrow_L.png",renderer, false), false};
-    arr[HISTORY_BW] = (Button){img_init(WIDTH - 700,HEIGHT - 300, "../sprites/arrow_R.png",renderer, false), false};
-    arr[CUT] = (Button){img_init(200,HEIGHT - 500, "../sprites/load.png",renderer, false), false};
-    arr[LOAD] = (Button){img_init(800,HEIGHT - 300, "../sprites/load.png",renderer, false), false};
-    arr[DELETE] = (Button){img_init(1000,HEIGHT - 300, "../sprites/delete.png",renderer, false), false};
-    arr[SAVE] = (Button){img_init(200,HEIGHT - 320, "../sprites/save.png",renderer, false), false};
-    arr[YES] = (Button){img_init(100, 200, "../sprites/yes.png",renderer, false), false};
-    arr[NO] = (Button){img_init(300, 200, "../sprites/delete.png",renderer, false), false};
+    arr[MENU] = (Button){img_init((pos){WIDTH - 200, 100}, "../sprites/menu_B.png",renderer, true), false};
+    arr[PLAY] = (Button){img_init((pos){WIDTH - 200, 300}, "../sprites/play_B.png",renderer, true), false};
+    arr[B_HISTORY] = (Button){img_init((pos){WIDTH - 200, 500}, "../sprites/history_B.png",renderer, true), false};
+    arr[PREV_BW] = (Button){img_init((pos){WIDTH - 400,HEIGHT - 300}, "../sprites/arrow_L.png",renderer, false), false};
+    arr[PREV_FW] = (Button){img_init((pos){WIDTH - 200,HEIGHT - 300}, "../sprites/arrow_R.png",renderer, false), false};
+    arr[PERSON] = (Button){img_init((pos){840, 330}, "../sprites/person.png",renderer, false), false};
+    arr[ROBOT] = (Button){img_init((pos){840, 530}, "../sprites/robot.png",renderer, false), false};
+    arr[B_BLACK] = (Button){img_init((pos){850, 350}, "../sprites/disk_B.png",renderer, false), false};
+    arr[B_WHITE] = (Button){img_init((pos){850, 550}, "../sprites/disk_W.png",renderer, false), false};
+    arr[B_NEW] = (Button){img_init((pos){200,HEIGHT - 150}, "../sprites/new.png",renderer, false), false};
+    arr[HISTORY_FW] = (Button){img_init((pos){600,HEIGHT - 300}, "../sprites/arrow_L.png",renderer, false), false};
+    arr[HISTORY_BW] = (Button){img_init((pos){WIDTH - 700,HEIGHT - 300}, "../sprites/arrow_R.png",renderer, false), false};
+    arr[CUT] = (Button){img_init((pos){200,HEIGHT - 500}, "../sprites/load.png",renderer, false), false};
+    arr[LOAD] = (Button){img_init((pos){800,HEIGHT - 300}, "../sprites/load.png",renderer, false), false};
+    arr[DELETE] = (Button){img_init((pos){1000,HEIGHT - 300}, "../sprites/delete.png",renderer, false), false};
+    arr[SAVE] = (Button){img_init((pos){200,HEIGHT - 320}, "../sprites/save.png",renderer, false), false};
+    arr[YES] = (Button){img_init((pos){100, 200}, "../sprites/yes.png",renderer, false), false};
+    arr[NO] = (Button){img_init((pos){300, 200}, "../sprites/delete.png",renderer, false), false};
 }
 
 void button_ctrl_minimal(Button *b)
@@ -39,7 +39,7 @@ void button_ctrl_minimal(Button *b)
 
 bool button_pressable(Button *b, button_id id, pos p)
 {
-    return b[id].img.visible && !b[id].pressed && img_hover(&b[id].img, p.x, p.y);
+    return b[id].img.visible && !b[id].pressed && img_hover(&b[id].img, p);
 }
 
 void button_ctrl_destroy(Button* b)
@@ -52,7 +52,7 @@ void button_ctrl_destroy(Button* b)
 
 void button_event(pos p, Button *b, Master *m)
 {
-    if (img_hover(&b[MENU].img, p.x, p.y))
+    if (img_hover(&b[MENU].img, p))
     {
         for (int i = 1; i < SIZE; i++)
         {

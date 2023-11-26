@@ -39,7 +39,7 @@ void gamelist_remove(GameList **list)
     gamelist_fprint(list);
 }
 
-void gamelist_tofirst(GameList **list)
+void gamelist_tolast(GameList **list)
 {
     while (*list != NULL && (*list)->next != NULL)
         *list = (*list)->next;
@@ -50,17 +50,17 @@ void gamelist_load(Game *g, GameList **list){
     game_cpy(g, (*list)->game);
 }
 
-void gamelist_save(GameList **list, Game *g, Master *m)
+void gamelist_save(GameList **list, Game *g)
 {
     Game *game = (Game *)malloc(sizeof(Game));
     game_cpy(game, g);
     game->date = time(NULL);
     gamelist_add(list, game);
-    gamelist_tofirst(list);
+    gamelist_tolast(list);
     gamelist_fprint(list);
 }
 
-void gamelist_fread(GameList **list, Master* m){
+void gamelist_fread(GameList **list){
     FILE *fp = fopen("../save/save.txt", "r");
     char input;
     int enumbuffer;
@@ -97,7 +97,7 @@ void gamelist_fread(GameList **list, Master* m){
                 (*list)->game->list = (*list)->game->list->former;
             }
             (*list)->game->list->former = NULL;
-            (*list)->game->list->board = board_init(800, m);  // boardlength, tilecount -> higher struct (master?)
+            (*list)->game->list->board = board_init();  // boardlength, tilecount -> higher struct (master?)
             fscanf(fp, "%c%d", &input, &enumbuffer);
             (*list)->game->list->board.state = enumbuffer;
             fscanf(fp, "%c%d", &input, &enumbuffer);
@@ -118,9 +118,8 @@ void gamelist_fread(GameList **list, Master* m){
             fscanf(fp, "%c", &input);
         }
         game_tolast(&(*list)->game->list);
-        (*list)->game->history_board = (*list)->game->list;
     }
-    gamelist_tofirst(list);
+    gamelist_tolast(list);
     fclose(fp);
 }
 

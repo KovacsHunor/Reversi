@@ -24,7 +24,7 @@ Uint32 timer(Uint32 ms, void *param)
 
 int main()
 {
-    Master master = master_init(WIDTH, HEIGHT, SDL_WINDOW_RESIZABLE); // option: SDL_WINDOW_MAXIMIZED
+    Master master = master_init(SDL_WINDOW_RESIZABLE); // option: SDL_WINDOW_MAXIMIZED
     TTF_Init();
 
     SDL_TimerID id = SDL_AddTimer(100, timer, NULL);
@@ -33,7 +33,7 @@ int main()
     SDL_RenderClear(master.renderer);
 
     GameList *list = NULL;
-    gamelist_fread(&list, &master);
+    gamelist_fread(&list);
 
     Game game;
     game_init(&game);
@@ -61,7 +61,7 @@ int main()
             if (master.state == HISTORY)
                 font_render(master.renderer, (pos){700, 500}, list != NULL?ctime(&list->game->date):"nincs mentett játszma");
             if (controls[PLAY].pressed)
-                board_render(master.renderer, &game.history_board->board, game.player_color);
+                board_render(master.renderer, &game.list->board, game.player_color);
             
             button_render_all(controls, master.renderer);
             SDL_RenderPresent(master.renderer);
@@ -88,6 +88,7 @@ int main()
         }
     }
     gamelist_destroy(list);
+    game_tolast(&game.list);
     game_list_bwdestroy(game.list);
     button_ctrl_destroy(controls);
     SDL_RemoveTimer(id);

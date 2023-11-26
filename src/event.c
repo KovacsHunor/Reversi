@@ -47,18 +47,18 @@ static void event_basic(Button *controls, GameList **list, Game *g, Master *m)
     controls[B_NEW].img.visible = true;
     if (controls[PREV_BW].pressed)
     {
-        if (g->history_board->former != NULL)
+        if (g->list->former != NULL)
         {
-            g->history_board = g->history_board->former;
+            g->list = g->list->former;
             g->state = PREV;
         }
         controls[PREV_BW].pressed = false;
     }
     else if (controls[PREV_FW].pressed)
     {
-        if (g->history_board->next != NULL)
-            g->history_board = g->history_board->next;
-        if (g->history_board->next == NULL)
+        if (g->list->next != NULL)
+            g->list = g->list->next;
+        if (g->list->next == NULL)
             g->state = MATCH;
         controls[PREV_FW].pressed = false;
     }
@@ -66,7 +66,7 @@ static void event_basic(Button *controls, GameList **list, Game *g, Master *m)
         event_pressed_confirm(controls, &m->ask, g, B_NEW, list);
     else if (controls[SAVE].pressed)
     {
-        gamelist_save(list, g, m);
+        gamelist_save(list, g);
         controls[SAVE].pressed = false;
     }
     if (g->state == PREV)

@@ -8,18 +8,30 @@
 #include "debugmalloc.h"
 
 
+/// @brief kép típus
 typedef struct Image{
-    int x, y, w, h;
+    pos p, size;
     SDL_Texture *sprite;
     bool visible;
 }Image;
 
-bool img_hover(Image* img, int x, int y);
+/// @brief megadja, hogy az adott pozíció a képen van-e
+/// @param img a kép
+/// @param p a pozíció
+/// @return IGAZ ha a pozíció a képen van
+bool img_hover(Image* img, pos p);
 
-Image img_init(int x, int y, char* path, SDL_Renderer* renderer, bool visible);
+/// @brief visszatér egy kép típussal, a képet a path által meghatározott helyről olvassa be
+/// @param p a kép poziíciója
+/// @param path a kép fájl elérési útja
+/// @param renderer a renderer
+/// @param visible megadja, hogy látható-e kezdetben a kép
+/// @return a kép
+Image img_init(pos p, char* path, SDL_Renderer* renderer, bool visible);
 
+/// @brief rendereli a képet
+/// @param img a kép
+/// @param renderer a renderer 
 void img_render(Image* img, SDL_Renderer* renderer);
-
-void img_texture_swap(SDL_Texture** a, SDL_Texture** b);
 
 #endif

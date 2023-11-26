@@ -9,9 +9,8 @@ void game_init(Game *g)
 
 void game_cut(Game *g)
 {
-    g->list = g->history_board;
-    game_list_fwdestroy(g->history_board->next);
-    g->history_board->next = NULL;
+    game_list_fwdestroy(g->list->next);
+    g->list->next = NULL;
     g->state = MATCH;
 }
 
@@ -30,8 +29,6 @@ static void game_add_position(Game *g)
     root->former = g->list;
     root->next = NULL;
     g->list = root;
-
-    g->history_board = g->list;
 }
 
 void game_player_event(Game *g, pos p)
@@ -93,22 +90,10 @@ void game_tolast(BoardList **list)
         *list = (*list)->next;
 }
 
-static void game_hbcpy(Game *dst, Game *src)
-{
-    BoardList *temp = src->list;
-    while (src->history_board != temp)
-    {
-        temp = temp->former;
-        dst->history_board = dst->history_board->former;
-    }
-}
-
 void game_cpy(Game *dst, Game *src)
 {
     *dst = (Game){.state = src->state, .list = NULL, .player_color = src->player_color, .opponent = src->opponent};
     game_listcpy(&dst->list, src->list);
-    dst->history_board = dst->list;
-    game_hbcpy(dst, src);
 }
 
 void game_list_bwdestroy(BoardList *list)
@@ -129,6 +114,7 @@ void game_list_fwdestroy(BoardList *list)
 
 void game_destroy(Game *g)
 {
+    game_tolast(&g->list);
     game_list_bwdestroy(g->list);
     free(g);
 }

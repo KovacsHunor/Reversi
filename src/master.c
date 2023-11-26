@@ -1,14 +1,14 @@
 #include "master.h"
 
-Master master_init(int width, int height, Uint32 mode){
-    Master m = {.ask = false, .state = GAME, .width = width, .height = height, .mode = mode};
+Master master_init(Uint32 mode){
+    Master m = {.ask = false, .state = GAME, .width = WIDTH, .height = HEIGHT, .mode = mode};
     master_set_SDL(&m);
     return m;
 }
 
 /*initialize sdl
 master init uses it, do not call it elsewhere*/
-void master_set_SDL(Master* m)
+static void master_set_SDL(Master* m)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {

@@ -209,11 +209,11 @@ static void board_render_disk(Disk d, pos p, SDL_Renderer *renderer)
 {
     Image img;
     if (d == WHITE)
-        img = img_init(p.x, p.y, "../sprites/disk_W.png", renderer, true);
+        img = img_init(p, "../sprites/disk_W.png", renderer, true);
     else if (d == BLACK)
-        img = img_init(p.x, p.y, "../sprites/disk_B.png", renderer, true);
+        img = img_init(p, "../sprites/disk_B.png", renderer, true);
     else if (d == VALID)
-        img = img_init(p.x, p.y, "../sprites/disk_V.png", renderer, true);
+        img = img_init(p, "../sprites/disk_V.png", renderer, true);
     img_render(&img, renderer);
     SDL_DestroyTexture(img.sprite);
 }

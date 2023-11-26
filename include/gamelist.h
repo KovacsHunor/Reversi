@@ -6,6 +6,7 @@
 
 /// @brief egyes meccseket tároló láncolt lista
 typedef struct GameList{
+    /// @brief adott meccs
     Game* game;
     struct GameList* former;
     struct GameList* next;

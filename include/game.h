@@ -52,12 +52,12 @@ void game_AI_event(Game* g);
 
 /// @brief hozzáfűz egy új állást az eddigi álláslistához 
 /// @param g 
-static void game_add_position(Game* g);
+void game_add_position(Game* g);
 
 /// @brief átmásolja dst-be az src által mutatott álláslistát, az állások felszabadítása a hívó felelőssége
 /// @param dst ahova másol
 /// @param src ahonnan másol
-static void game_listcpy(BoardList** dst, BoardList* src);
+void game_listcpy(BoardList** dst, BoardList* src);
 
 /// @brief az utolsó állásba lépteti a listát
 /// @param list a lista

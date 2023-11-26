@@ -10,7 +10,7 @@
 #include "gamelist.h"
 
 /// @brief a vezérlőgombok azonosítói
-typedef enum button_id
+typedef enum Button_id
 {
     MENU,
     PLAY,
@@ -31,7 +31,7 @@ typedef enum button_id
     YES,
     NO,
     SIZE
-} button_id;
+} Button_id;
 
 /// @brief gomb típus
 typedef struct Button
@@ -49,7 +49,7 @@ void button_ctrl_destroy(Button* b);
 /// @param id a gomb azonosítója
 /// @param p a kattintás helye
 /// @return megnyomható-e
-bool button_pressable(Button *b, button_id id, pos p);
+bool button_pressable(Button *b, Button_id id, pos p);
 
 /// @brief a menü gombokon kívül minden gombot eltűntet
 /// @param b a gombok tömbje

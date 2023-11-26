@@ -2,7 +2,7 @@
 
 Board board_init()
 {
-    return (Board){.side = BLACK, .state = BASIC, .msg = (pos){200, 500}, .points = {0, 0}, .valid_count = 0};
+    return (Board){.side = BLACK, .state = BASIC, .points = {0, 0}, .valid_count = 0};
 }
 
 void board_default(Board *b)
@@ -31,7 +31,7 @@ Disk board_more(Board *b)
     return NONE;
 }
 
-int minimax(Board *b, int depth, int alpha, int beta)
+int board_minimax(Board *b, int depth, int alpha, int beta)
 {
     if (depth >= 6 || b->valid_count == 0)
     {
@@ -49,7 +49,7 @@ int minimax(Board *b, int depth, int alpha, int beta)
                 Board board = *b;
                 board_put_disk(&board, (pos){x, y});
                 board_after_move(&board);
-                int value = minimax(&board, depth + 1, alpha, beta);
+                int value = board_minimax(&board, depth + 1, alpha, beta);
 
                 if (b->side == BLACK)
                 {
@@ -84,31 +84,32 @@ int minimax(Board *b, int depth, int alpha, int beta)
     return best;
 }
 
-static void board_print_state(Board *b, SDL_Renderer *renderer)
+void board_print_state(Board *b, SDL_Renderer *renderer)
 {
+    pos msg = (pos){MSGX, MSGY};
     if (b->state == END)
     {
         Disk winner = board_more(b);
         if (winner == BLACK)
         {
-            font_render(renderer, b->msg, "BLACK win");
+            font_render(renderer, msg, "BLACK win");
         }
         else if (winner == WHITE)
         {
-            font_render(renderer, b->msg, "WHITE win");
+            font_render(renderer, msg, "WHITE win");
         }
         else
-            font_render(renderer, b->msg, "DRAW");
+            font_render(renderer, msg, "DRAW");
     }
     else if (b->state == PASS)
     {
         if (b->side == BLACK)
         {
-            font_render(renderer, b->msg, "WHITE: PASS");
+            font_render(renderer, msg, "WHITE: PASS");
         }
         else
         {
-            font_render(renderer, b->msg, "BLACK: PASS");
+            font_render(renderer, msg, "BLACK: PASS");
         }
     }
 }
@@ -150,7 +151,7 @@ void board_put_disk(Board *b, pos p)
     board_raycast(b, (pos){p.x, p.y}, true);
 }
 
-static bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip)
+bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip)
 {
     if (p.x >= 0 && p.x < TILECOUNT && p.y >= 0 && p.y < TILECOUNT)
     {
@@ -172,7 +173,7 @@ static bool board_rec_valid(Board *b, pos p, pos v, bool first, bool flip)
     return false;
 }
 
-static bool board_raycast(Board *b, pos p, bool flip)
+bool board_raycast(Board *b, pos p, bool flip)
 {
     bool valid = false;
     for (int i = -1; i <= 1; i++)
@@ -205,7 +206,7 @@ void board_set_valid(Board *b)
     }
 }
 
-static void board_render_disk(Disk d, pos p, SDL_Renderer *renderer)
+void board_render_disk(Disk d, pos p, SDL_Renderer *renderer)
 {
     Image img;
     if (d == WHITE)
@@ -218,7 +219,7 @@ static void board_render_disk(Disk d, pos p, SDL_Renderer *renderer)
     SDL_DestroyTexture(img.sprite);
 }
 
-static void board_clear_valid(Board *b)
+void board_clear_valid(Board *b)
 {
     for (int i = 0; i < TILECOUNT; i++)
     {

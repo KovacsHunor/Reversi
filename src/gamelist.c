@@ -63,8 +63,8 @@ void gamelist_save(GameList **list, Game *g)
 
 void gamelist_fread(GameList **list){
     FILE *fp = fopen("../save/save.txt", "r");
-    char input;
     int enumbuffer;
+    char input;
     while (fscanf(fp, "%c", &input) != EOF)
     {
         if(*list == NULL){
@@ -87,7 +87,6 @@ void gamelist_fread(GameList **list){
         fscanf(fp, "%c", &input);
         while (input != '!')
         {
-            //cikluson belül kell legyen, mert nem tudni, mikor jön vége jelzés (!)
             if((*list)->game->list == NULL){
                 (*list)->game->list = (BoardList *)malloc(sizeof(BoardList));
                 (*list)->game->list->next = NULL;
@@ -98,7 +97,7 @@ void gamelist_fread(GameList **list){
                 (*list)->game->list = (*list)->game->list->former;
             }
             (*list)->game->list->former = NULL;
-            (*list)->game->list->board = board_init();  // boardlength, tilecount -> higher struct (master?)
+            (*list)->game->list->board = board_init();
             fscanf(fp, "%c%d", &input, &enumbuffer);
             (*list)->game->list->board.state = enumbuffer;
             fscanf(fp, "%c%d", &input, &enumbuffer);
@@ -122,6 +121,7 @@ void gamelist_fread(GameList **list){
     }
     gamelist_tolast(list);
     fclose(fp);
+    printf("%d", enumbuffer);
 }
 
 void gamelist_fprint(GameList **list)

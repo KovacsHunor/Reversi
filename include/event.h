@@ -13,21 +13,21 @@
 /// @param g az adott meccs
 /// @param id a gomb azonosítója
 /// @param list a meccsek listája
-static void event_pressed_confirm(Button *controls, bool* ask, Game *g, button_id id, GameList **list);
+void event_pressed_confirm(Button *controls, bool* ask, Game *g, Button_id id, GameList **list);
 
-static void event_basic(Button *controls, GameList **list, Game *g, Master *m);
+void event_basic(Button *controls, GameList **list, Game *g, Master *m);
 
-static void event_opponent(Button *controls, GameList **list, Game *g);
+void event_opponent(Button *controls, GameList **list, Game *g);
 
-static void event_color(Button *controls, GameList **list, Game *g);
+void event_color(Button *controls, GameList **list, Game *g);
 
-static void event_game(Button *controls, GameList **list, Game *g, Master *m);
+void event_game(Button *controls, GameList **list, Game *g, Master *m);
 
-static void event_history(Button *controls, GameList **list, Game *g, bool* ask);
+void event_history(Button *controls, GameList **list, Game *g, bool* ask);
 
-static void event_askflip(Button *controls, bool *ask);
+void event_askflip(Button *controls, bool *ask);
 
-static void event_history_off(Button *controls);
+void event_history_off(Button *controls);
 
 
 /// @brief a vezérőgombok állapota alapján állítja a program állapotát

@@ -14,7 +14,7 @@ void game_cut(Game *g)
     g->state = MATCH;
 }
 
-static void game_add_position(Game *g)
+void game_add_position(Game *g)
 {
     BoardList *root = (BoardList *)malloc(sizeof(BoardList));
     if (g->list != NULL)
@@ -53,11 +53,11 @@ void game_player_event(Game *g, pos p)
 void game_AI_event(Game *g)
 {
     game_add_position(g);
-    minimax(&g->list->board, 0, INT32_MIN, INT32_MAX);
+    board_minimax(&g->list->board, 0, INT32_MIN, INT32_MAX);
     board_after_move(&g->list->board);
 }
 
-static void game_listcpy(BoardList **dst, BoardList *src)
+void game_listcpy(BoardList **dst, BoardList *src)
 {
     if (src != NULL)
     {

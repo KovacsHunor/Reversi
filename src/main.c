@@ -43,7 +43,6 @@ int main()
     button_render_all(controls, master.renderer);
 
     SDL_RenderPresent(master.renderer);
-    bool draw = false;
     bool quit = false;
     while (!quit)
     {
@@ -69,6 +68,8 @@ int main()
             if (game.state == MATCH && game.list->board.side == board_flip_color(game.player_color) && game.opponent == AI && game.list->board.state != END && master.state == GAME)
             {
                 game_AI_event(&game);
+                if(game.list->board.state == END)
+                    gamelist_save(&list, &game);
             }
             break;
         case SDL_MOUSEBUTTONUP:
@@ -79,6 +80,8 @@ int main()
                 if (!master.ask && game.state == MATCH && master.state == GAME && ((game.opponent == AI && game.list->board.side == game.player_color) || game.opponent == HUMAN))
                 {
                     game_player_event(&game, (pos){event.button.x, event.button.y});
+                    if(game.list->board.state == END)
+                        gamelist_save(&list, &game);
                 }
             }
             break;
@@ -87,6 +90,7 @@ int main()
             break;
         }
     }
+
     gamelist_destroy(list);
     game_tolast(&game.list);
     game_list_bwdestroy(game.list);

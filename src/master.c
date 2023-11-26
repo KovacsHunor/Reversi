@@ -8,7 +8,7 @@ Master master_init(Uint32 mode){
 
 /*initialize sdl
 master init uses it, do not call it elsewhere*/
-static void master_set_SDL(Master* m)
+void master_set_SDL(Master* m)
 {
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {

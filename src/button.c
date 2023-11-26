@@ -37,7 +37,7 @@ void button_ctrl_minimal(Button *b)
     }
 }
 
-bool button_pressable(Button *b, button_id id, pos p)
+bool button_pressable(Button *b, Button_id id, pos p)
 {
     return b[id].img.visible && !b[id].pressed && img_hover(&b[id].img, p);
 }

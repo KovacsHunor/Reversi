@@ -30,6 +30,6 @@ Master master_init(Uint32 mode);
 
 /// @brief elvégzi a szükséges alapbeállításokat az sdl használatához
 /// @param m mester típus, az ablak megjelenítési módjának függvényébe változhat a width és height értéke
-static void master_set_SDL(Master* m);
+void master_set_SDL(Master* m);
 
 #endif

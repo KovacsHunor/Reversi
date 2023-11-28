@@ -6,6 +6,7 @@
 #include "game.h"
 #include "button.h"
 #include "gamelist.h"
+#include "debugmalloc.h"
 
 /// @brief adatvesztés lehetőségével járó gombnyomások megerősítésének kezelése
 /// @param controls gombok tömbje

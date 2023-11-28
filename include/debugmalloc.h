@@ -9,7 +9,6 @@
 #include <string.h>
 #include <stdarg.h>
 
-//int putenv(char *string);
 
 enum {
     /* size of canary in bytes. should be multiple of largest alignment

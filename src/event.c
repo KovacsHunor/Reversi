@@ -3,9 +3,7 @@
 void event_pressed_confirm(Button *controls, bool *ask, Game *g, Button_id id, GameList **list)
 {
     if (!*ask)
-    {
         event_askflip(controls, ask);
-    }
     *ask = true;
     if (controls[YES].pressed)
     {

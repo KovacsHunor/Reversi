@@ -27,8 +27,7 @@ int main()
     Master master = master_init(SDL_WINDOW_RESIZABLE); // option: SDL_WINDOW_MAXIMIZED
     TTF_Init();
 
-    SDL_TimerID id = SDL_AddTimer(100, timer, NULL);
-
+    SDL_TimerID id = SDL_AddTimer(125, timer, NULL);
     SDL_SetRenderDrawColor(master.renderer, 0, 0, 0, 255);
     SDL_RenderClear(master.renderer);
 
@@ -58,10 +57,23 @@ int main()
             if (master.ask)
                 font_render(master.renderer, (pos){200, 100}, "biztos?");
             if (master.state == HISTORY)
-                font_render(master.renderer, (pos){700, 500}, list != NULL?ctime(&list->game->date):"nincs mentett játszma");
+            {
+                if (list != NULL)
+                {
+                    char time[24 + 1];
+                    strncpy(time, ctime(&list->game->date), 24);
+                    time[24] = '\0';
+                    font_render(master.renderer, (pos){700, 500}, time);
+                }
+                else
+                {
+                    font_render(master.renderer, (pos){700, 500}, "nincs mentett játszma");
+                }
+            }
+
             if (controls[PLAY].pressed)
                 board_render(master.renderer, &game.list->board, game.player_color);
-            
+
             button_render_all(controls, master.renderer);
             SDL_RenderPresent(master.renderer);
 

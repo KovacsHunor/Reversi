@@ -16,4 +16,10 @@ int min(int a, int b){
     return a<b?a:b;
 }
 
-
+void merror(void* pointer){
+    if (pointer == NULL)
+    {
+        perror("Nem sikerült memóriát foglalni!");
+        exit(1);
+    }
+}

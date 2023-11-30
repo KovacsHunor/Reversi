@@ -3,11 +3,7 @@
 void gamelist_add(GameList **list, Game *g)
 {
     GameList *new = (GameList *)malloc(sizeof(GameList));
-    if (new == NULL)
-    {
-        perror("Nem sikerült memóriát foglalni!");
-        exit(1);
-    }
+    merror(new);
     new->game = g;
     new->former = *list;
     new->next = NULL;
@@ -63,11 +59,7 @@ void gamelist_load(Game *g, GameList **list)
 void gamelist_save(GameList **list, Game *g)
 {
     Game *game = (Game *)malloc(sizeof(Game));
-    if (game == NULL)
-    {
-        perror("Nem sikerült memóriát foglalni!");
-        exit(1);
-    }
+    merror(game);
     game_cpy(game, g);
     game->date = time(NULL);
     gamelist_add(list, game);
@@ -91,31 +83,19 @@ void gamelist_fread(GameList **list)
             if (*list == NULL)
             {
                 *list = (GameList *)malloc(sizeof(GameList));
-                if (*list == NULL)
-                {
-                    perror("Nem sikerült memóriát foglalni!");
-                    exit(1);
-                }
+                merror(*list);
                 (*list)->next = NULL;
             }
             else
             {
                 (*list)->former = (GameList *)malloc(sizeof(GameList));
-                if ((*list)->former == NULL)
-                {
-                    perror("Nem sikerült memóriát foglalni!");
-                    exit(1);
-                }
+                merror((*list)->former);
                 (*list)->former->next = *list;
                 *list = (*list)->former;
             }
             (*list)->former = NULL;
             (*list)->game = (Game *)malloc(sizeof(Game));
-            if ((*list)->game == NULL)
-            {
-                perror("Nem sikerült memóriát foglalni!");
-                exit(1);
-            }
+            merror((*list)->game);
             *(*list)->game = (Game){.list = NULL};
             fscanf(fp, "%c%ld", &input, &(*list)->game->date);
             fscanf(fp, "%c%d", &input, &enumbuffer);
@@ -128,21 +108,13 @@ void gamelist_fread(GameList **list)
                 if ((*list)->game->list == NULL)
                 {
                     (*list)->game->list = (BoardList *)malloc(sizeof(BoardList));
-                    if ((*list)->game->list == NULL)
-                    {
-                        perror("Nem sikerült memóriát foglalni!");
-                        exit(1);
-                    }
+                    merror((*list)->game->list);
                     (*list)->game->list->next = NULL;
                 }
                 else
                 {
                     (*list)->game->list->former = (BoardList *)malloc(sizeof(BoardList));
-                    if ((*list)->game->list->former == NULL)
-                    {
-                        perror("Nem sikerült memóriát foglalni!");
-                        exit(1);
-                    }
+                    merror((*list)->game->list->former);
                     (*list)->game->list->former->next = (*list)->game->list;
                     (*list)->game->list = (*list)->game->list->former;
                 }

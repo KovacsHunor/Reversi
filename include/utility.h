@@ -50,4 +50,6 @@ int max(int a, int b);
 /// @return kisebb egész
 int min(int a, int b);
 
+void merror(void *pointer);
+
 #endif
